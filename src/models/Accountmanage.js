@@ -4,12 +4,12 @@ export default {
     namespace: 'account',
     state: {
       accountList: [],
+      total:0,
     },
   
     effects: {
       *queryAccount({payload,callback}, { call, put }) {
-        const response = yield call(queryAccounts,JSON.stringify(payload));
-        debugger;
+        const response = yield call(queryAccounts,payload);
         yield put({
           type: 'queryAccountList',
           payload: response,
@@ -23,10 +23,10 @@ export default {
   
     reducers: {
       queryAccountList(state, action) {
-        debugger;
         return {
           ...state,
-          accountList: action.payload.rows,
+          accountList: action.payload ? action.payload.rows :[] ,
+          total:action.payload ? action.payload.total:0,
         };
       },
     
