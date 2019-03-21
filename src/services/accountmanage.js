@@ -7,4 +7,22 @@ export async function queryAccounts(params) {
     body: JSON.stringify(params),
     headers:{'Content-Type': 'application/json;charset=utf-8'}
     });
-  }  
+  } 
+  
+  export async function queryDirection(params) {
+    return request('/service/queryDirection/',
+    {
+    method:"post",
+    body: JSON.stringify(params),
+    headers:{'Content-Type': 'application/json;charset=utf-8'}
+    });
+  } 
+  //新增账户
+  export async function addAccount(params) {
+    return request('/service/addAccount/',
+    {
+    method:"post",
+    body: JSON.stringify(params),
+    headers:{'Content-Type': 'application/json;charset=utf-8'}
+    });
+  }
