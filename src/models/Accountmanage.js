@@ -1,4 +1,4 @@
-import {queryAccounts,queryDirection,addAccount} from '@/services/accountmanage'
+import {queryAccounts,queryDirection,addAccount,modifyAccount} from '@/services/accountmanage'
 
 export default {
     namespace: 'account',
@@ -14,6 +14,17 @@ export default {
         const response = yield call(queryAccounts,payload);
         yield put({
           type: 'queryAccountList',
+          payload: response,
+        });
+        if(callback){
+          callback();
+        }
+      },
+      //修改账户
+      *modifyAccount({payload,callback}, { call, put }) {
+        const response = yield call(modifyAccount,payload);
+        yield put({
+          type: 'addAccountResult',
           payload: response,
         });
         if(callback){

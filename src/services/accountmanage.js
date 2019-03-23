@@ -26,3 +26,13 @@ export async function queryAccounts(params) {
     headers:{'Content-Type': 'application/json;charset=utf-8'}
     });
   }
+
+  //修改账户
+  export async function modifyAccount(params) {
+    return request('/service/modifyAccount/',
+    {
+    method:"post",
+    body: JSON.stringify(params),
+    headers:{'Content-Type': 'application/json;charset=utf-8'}
+    });
+  }

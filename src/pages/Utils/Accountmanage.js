@@ -1,14 +1,19 @@
 import React, { PureComponent } from 'react';
 import { findDOMNode } from 'react-dom';
-import moment from 'moment';
+//import moment from 'moment';
 import { connect } from 'dva';
-import {Table,Form,Button,Pagination,Input,Row,Col,Select,Icon,Modal,Radio ,DatePicker,notification } from 'antd';
+import {Table,Form,Button,Pagination,Input,Row,Col,Select,Icon,Modal,Radio ,DatePicker,notification,message } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import Result from '@/components/Result';
-import 'moment/locale/zh-cn';
+import Moment from 'moment'
+//import 'moment/locale/zh-cn';
+message.config({
+  top: 300,
+  duration: 2,
+  maxCount: 1 ,
+});
 
-
-moment.locale('zh-cn');
+//moment.locale('zh-cn');
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
@@ -19,7 +24,7 @@ const { TextArea } = Input;
   class extends React.Component {
     render() {
       const {
-        visible, onCancel, onCreate, form,direction
+        visible, onCancel, onCreate, form,direction,operateType
       } = this.props;
       const { getFieldDecorator } = form;
       const options = direction.length >0 ? direction.map(d => <Option key={d.id}>{d.text}</Option>) :"";
@@ -33,10 +38,13 @@ const { TextArea } = Input;
           sm: { span: 15 },
         },
       };
+      debugger;
+      var title = operateType =="add"? "新增账户":"编辑账户";
       return (
+       
         <Modal
           visible={visible}
-          title="新增账户"
+          title= {title}
           okText="保存"
           onCancel={onCancel}
           onOk={onCreate}
@@ -90,14 +98,19 @@ const { TextArea } = Input;
               })(<Input/>)}
             </Form.Item>
             <Form.Item label="注册时间" >
-          {getFieldDecorator('registrationTime', {rules: [{ type: 'object', message: '请选择注册时间!' }]})
-            (<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" style={{width:"100%"}}/>
+          {getFieldDecorator('registrationTime', {rules: [{ type: 'object', message: '请选择正确的注册时间!' }]})
+            (<DatePicker placeholder = "请选择注册时间" showTime format="YYYY-MM-DD HH:mm:ss" style={{width:"100%"}}/>
           )}
         </Form.Item>
         <Form.Item label="备注">
               {getFieldDecorator('remarks',{
                
               })(<Input.TextArea />)}
+            </Form.Item>
+            <Form.Item >
+              {getFieldDecorator('accountId',{
+               
+              })(<Input type="hidden"/>)}
             </Form.Item>
           </Form>
         </Modal>
@@ -116,6 +129,8 @@ class Accountmanage extends PureComponent {
   state = {
     loading: false,
     formvisible:false,
+    selectedRows:[],
+    operateType:"",
   };
 
 
@@ -185,9 +200,28 @@ class Accountmanage extends PureComponent {
       });
   };
 
+  //新增账户
   addAccount = e =>{
+    this.setState({operateType:"add"});
     this.showModal();
   };
+  //编辑选中项
+  editSelectRow = e =>{
+    const {selectedRows} = this.state;
+    const form = this.formRef.props.form;
+    if(selectedRows.length != 1){
+      message.error('每次只能编辑一个账户！');
+      return false;
+    }
+    this.setState({operateType:"edit"});
+    this.showModal();
+    debugger;
+    var row = selectedRows[0];
+    var moment = Moment(row.registrationTime,'YYYY-MM-DD HH:mm:ss');
+    row["registrationTime"] = moment;
+    form.setFieldsValue(row);
+   
+  }
   //表单弹窗相关
   showModal = () => {
     this.setState({ formvisible: true });
@@ -195,7 +229,10 @@ class Accountmanage extends PureComponent {
 
   handleCancel = () => {
     this.setState({ formvisible: false });
+    const form = this.formRef.props.form;
+    form.resetFields();
   }
+
   
   //新增&保存账户信息
   handleCreate = () => {
@@ -210,8 +247,16 @@ class Accountmanage extends PureComponent {
       var registrationTime = values.registrationTime;
       registrationTime = registrationTime.format('YYYY-MM-DD HH:mm:ss');
       values["registrationTime"] = registrationTime;
+      const {operateType} = this.state;
+      var url;
+      if(operateType ==  "add"){
+        var url = 'account/addAccount';
+      }
+      if(operateType ==  "edit"){
+        var url = 'account/modifyAccount';
+      }
       dispatch({
-        type: 'account/addAccount',
+        type: url,
         payload: values,
         callback:() => {
             const {addAccountResult} = this.props;
@@ -219,15 +264,24 @@ class Accountmanage extends PureComponent {
               notification["error"]({
                 placement:"bottomRight",
                 message: '提示信息',
-                description: '新增用户失败!',
+                description: '操作失败!',
               });
             }else{
                 notification["success"]({
                 placement:"bottomRight",
                 message: '提示信息',
-                description: '新增用户成功!.',
+                description: '操作成功!',
               });
             }
+            //刷新表格
+            dispatch({
+              type: 'account/queryAccount',
+              payload: {
+                page: 1,
+                rows: 10,
+              },
+            });
+
         }
       });
 
@@ -297,6 +351,7 @@ class Accountmanage extends PureComponent {
     }
     ];
     const { accountList, total, form,direction } = this.props;
+    const {operateType} = this.state;
     return (
       <div>
         <Form onSubmit={this.handleSearch} layout="inline" style={{marginBottom:"1%",marginLeft:"1%"}}>
@@ -322,14 +377,16 @@ class Accountmanage extends PureComponent {
             <Col span={12}>
                 <div style={{float:"right",marginRight:0  }}>
                   <Button type="primary" icon="plus" onClick={this.addAccount}>新增</Button>
-                  <Button type="primary" icon="edit" onClick={this.handleSearch} style={{marginLeft:8}}>修改</Button>
+                  <Button type="primary" icon="edit" onClick={this.editSelectRow} style={{marginLeft:8}}>修改</Button>
                   <Button type="primary" icon="delete" onClick={this.handleSearch} style={{marginLeft:8}}>删除</Button>
                   <Button type="primary" icon="printer" onClick={this.handleSearch} style={{marginLeft:8}}>导出</Button>
                 </div>
             </Col>
           </Row>
         </Form>
-        <Table rowSelection={{}} columns={columns} dataSource={accountList} rowKey="accountId" bordered
+        <Table 
+          rowSelection={{onChange: (selectedRowKeys, selectedRows) => {this.setState({selectedRows:selectedRows}) ;}}} 
+          columns={columns} dataSource={accountList} rowKey="accountId" bordered
           pagination={{
             showSizeChanger: true, defaultCurrent: 1, total: total, defaultPageSize: 10, hideOnSinglePage: false,
             onShowSizeChange: this.onShowSizeChange,
@@ -343,6 +400,7 @@ class Accountmanage extends PureComponent {
           onCancel={this.handleCancel}
           onCreate={this.handleCreate} 
           direction = {direction}
+          operateType = {operateType}
         />
       </div>
     );
