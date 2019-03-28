@@ -1,4 +1,4 @@
-import {queryAccounts,queryDirection,addAccount,modifyAccount} from '@/services/accountmanage'
+import {queryAccounts,queryDirection,addAccount,modifyAccount,deleteAccount,exportAccount} from '@/services/accountmanage'
 
 export default {
     namespace: 'account',
@@ -49,6 +49,30 @@ export default {
           type: 'addAccountResult',
           payload: response,
         });
+        if(callback){
+          callback();
+        }
+      },
+      //删除账户
+      *deleteAccounts({payload,callback}, { call, put }){
+        const response = yield call(deleteAccount,payload);
+        yield put({
+          type: 'addAccountResult',
+          payload: response,
+        });
+        if(callback){
+          callback();
+        }
+      },
+
+      //导出数据
+      *exportAccounts({payload,callback}, { call, put }){
+        debugger;
+        const response = yield call(exportAccount,payload);
+        // yield put({
+        //   type: 'addAccountResult',
+        //   payload: response,
+        // });
         if(callback){
           callback();
         }

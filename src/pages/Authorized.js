@@ -6,7 +6,6 @@ import Authorized from '@/utils/Authorized';
 
 function AuthComponent({ children, location, routerData, status }) {
   const isLogin = status === 'ok';
-
   const getRouteAuthority = (pathname, routeData) => {
     const routes = routeData.slice(); // clone
 
@@ -30,6 +29,7 @@ function AuthComponent({ children, location, routerData, status }) {
     return getAuthority(routes, pathname);
   };
   return (
+    
     <Authorized
       authority={getRouteAuthority(location.pathname, routerData)}
       noMatch={isLogin ? <Redirect to="/exception/403" /> : <Redirect to="/user/login" />}

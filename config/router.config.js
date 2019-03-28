@@ -20,8 +20,8 @@ export default [
     component: '../layouts/BasicLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      // dashboard
-      { path: '/', redirect: '/dashboard/analysis' },
+      // dashboard   原本为 redirect: '/dashboard/analysis'
+      { path: '/', redirect: '/utils/accountmanage' },
       //实用工具菜单
       {
         path: '/utils',

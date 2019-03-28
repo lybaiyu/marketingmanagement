@@ -5,6 +5,7 @@ import Link from 'umi/link';
 import { Checkbox, Alert, Icon } from 'antd';
 import Login from '@/components/Login';
 import styles from './Login.less';
+import md5 from 'md5'
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
 
@@ -40,6 +41,9 @@ class LoginPage extends Component {
     });
 
   handleSubmit = (err, values) => {
+    const password = values.password;
+    const password1 = md5(password);
+    values['password'] = password1;
     const { type } = this.state;
     if (!err) {
       const { dispatch } = this.props;

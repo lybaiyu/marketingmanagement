@@ -5,7 +5,8 @@ import { connect } from 'dva';
 import {Table,Form,Button,Pagination,Input,Row,Col,Select,Icon,Modal,Radio ,DatePicker,notification,message } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import Result from '@/components/Result';
-import Moment from 'moment'
+import Moment from 'moment';
+import router from 'umi/router';
 //import 'moment/locale/zh-cn';
 message.config({
   top: 300,
@@ -38,7 +39,6 @@ const { TextArea } = Input;
           sm: { span: 15 },
         },
       };
-      debugger;
       var title = operateType =="add"? "新增账户":"编辑账户";
       return (
        
@@ -118,11 +118,12 @@ const { TextArea } = Input;
     }
   }
 );
-@connect(({ account, }) => ({
+@connect(({ account,user }) => ({
   accountList: account.accountList,
   total: account.total,
   direction:account.direction,
   addAccountResult:account.account,
+  currentUser:user.currentUser,
 }))
 @Form.create()
 class Accountmanage extends PureComponent {
@@ -133,11 +134,22 @@ class Accountmanage extends PureComponent {
     operateType:"",
   };
 
-
-
   componentDidMount() {
-
     const { dispatch } = this.props;
+  debugger;
+   //获取当前用户（登录状态）
+   dispatch({
+    type: 'user/fetchCurrent',
+    callback: () => {
+      debugger;
+     const {currentUser} = this.props;
+     if(!currentUser.userName){
+    //  route.push("/user/login");
+    router.push("/user/login")
+     }
+    }
+  });
+
     dispatch({
       type: 'account/queryAccount',
       payload: {
@@ -210,18 +222,65 @@ class Accountmanage extends PureComponent {
     const {selectedRows} = this.state;
     const form = this.formRef.props.form;
     if(selectedRows.length != 1){
-      message.error('每次只能编辑一个账户！');
+      message.error('请选择一个账户进行修改操作！');
       return false;
     }
     this.setState({operateType:"edit"});
     this.showModal();
-    debugger;
     var row = selectedRows[0];
     var moment = Moment(row.registrationTime,'YYYY-MM-DD HH:mm:ss');
     row["registrationTime"] = moment;
     form.setFieldsValue(row);
    
   }
+  //删除选中项
+  deleteSelectRow = e =>{
+    const {selectedRows} = this.state;
+    const {dispatch} = this.props;
+    if(selectedRows.length < 1){
+      message.error('请选择要删除的账户！');
+      return false;
+    }
+    dispatch({
+      type: 'account/deleteAccounts',
+      payload: selectedRows,
+      callback:() => {
+          const {addAccountResult} = this.props;
+          if(addAccountResult == "0"){
+            notification["error"]({
+              placement:"bottomRight",
+              message: '提示信息',
+              description: '操作失败!',
+            });
+          }else{
+              notification["success"]({
+              placement:"bottomRight",
+              message: '提示信息',
+              description: '操作成功!',
+            });
+          }
+          //刷新表格
+          dispatch({
+            type: 'account/queryAccount',
+            payload: {
+              page: 1,
+              rows: 10,
+            },
+          });
+
+      }
+    });
+  }
+
+  //导出表格数据到excel文件
+  exportAccount = e => {
+    const { dispatch, form } = this.props;
+    const values = form.getFieldsValue();
+    const accountName = values.accountName ? values.accountName : "";
+    const userName = values.userName ? values.userName : "";
+    window.location.href = "/service/exportAccount?accountName="+accountName+"&userName="+userName
+  }
+
   //表单弹窗相关
   showModal = () => {
     this.setState({ formvisible: true });
@@ -242,7 +301,6 @@ class Accountmanage extends PureComponent {
       if (err) {
         return;
       }
-      debugger;
       var values = form.getFieldsValue();
       var registrationTime = values.registrationTime;
       registrationTime = registrationTime.format('YYYY-MM-DD HH:mm:ss');
@@ -378,8 +436,8 @@ class Accountmanage extends PureComponent {
                 <div style={{float:"right",marginRight:0  }}>
                   <Button type="primary" icon="plus" onClick={this.addAccount}>新增</Button>
                   <Button type="primary" icon="edit" onClick={this.editSelectRow} style={{marginLeft:8}}>修改</Button>
-                  <Button type="primary" icon="delete" onClick={this.handleSearch} style={{marginLeft:8}}>删除</Button>
-                  <Button type="primary" icon="printer" onClick={this.handleSearch} style={{marginLeft:8}}>导出</Button>
+                  <Button type="primary" icon="delete" onClick={this.deleteSelectRow} style={{marginLeft:8}}>删除</Button>
+                  <Button type="primary" icon="printer" onClick={this.exportAccount} style={{marginLeft:8}}>导出</Button>
                 </div>
             </Col>
           </Row>

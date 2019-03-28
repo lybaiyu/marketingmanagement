@@ -60,6 +60,7 @@ if (APP_TYPE === 'site') {
 
 export default {
   // add for transfer to umi
+ // history: 'hash', // 默认是 browser
   plugins,
   define: {
     APP_TYPE: APP_TYPE || '',
@@ -81,7 +82,7 @@ export default {
   },
   proxy: {
     '/service': {
-      target: 'http://localhost:8080/',
+      target: 'http://localhost:8080/service',
       changeOrigin: true,
       pathRewrite:{'^/service':''},
     },
