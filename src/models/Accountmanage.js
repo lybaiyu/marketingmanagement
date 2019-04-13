@@ -67,7 +67,6 @@ export default {
 
       //导出数据
       *exportAccounts({payload,callback}, { call, put }){
-        debugger;
         const response = yield call(exportAccount,payload);
         // yield put({
         //   type: 'addAccountResult',

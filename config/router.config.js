@@ -18,10 +18,25 @@ export default [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: ['src/pages/Authorized'],
+    // Routes: ['src/pages/Authorized'],
     routes: [
       // dashboard   原本为 redirect: '/dashboard/analysis'
       { path: '/', redirect: '/utils/accountmanage' },
+     //店铺管理菜单
+     {
+      path: '/market',
+      name: 'market',
+      icon: 'appstore',
+      routes: [
+        {
+          path: '/market/goodsmanage',
+          name: 'goodsmanage',
+          component: './Market/Goodsmanage',
+        },
+      ],
+    },
+     
+     
       //实用工具菜单
       {
         path: '/utils',
@@ -33,16 +48,6 @@ export default [
             name: 'accountmanage',
             component: './Utils/Accountmanage',
           },
-          // {
-          //   path: '/dashboard/monitor',
-          //   name: 'monitor',
-          //   component: './Dashboard/Monitor',
-          // },
-          // {
-          //   path: '/dashboard/workplace',
-          //   name: 'workplace',
-          //   component: './Dashboard/Workplace',
-          // },
         ],
       },
 
@@ -106,12 +111,12 @@ export default [
               },
             ],
           },
-          {
-            path: '/form/advanced-form',
-            name: 'advancedform',
-            authority: ['admin'],
-            component: './Forms/AdvancedForm',
-          },
+          // {
+          //   path: '/form/advanced-form',
+          //   name: 'advancedform',
+          //   authority: ['admin'],
+          //   component: './Forms/AdvancedForm',
+          // },
         ],
       },
       // list

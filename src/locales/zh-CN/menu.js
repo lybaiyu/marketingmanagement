@@ -40,4 +40,6 @@ export default {
   'menu.account.logout': '退出登录',
   'menu.utils': '实用工具',
   'menu.utils.accountmanage': '账户管理',
+  'menu.market': '商铺管理',
+  'menu.market.goodsmanage': '商品基础信息管理',
 };

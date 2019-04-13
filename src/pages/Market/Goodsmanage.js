@@ -40,7 +40,7 @@ const { TextArea } = Input;
           sm: { span: 15 },
         },
       };
-      var title = operateType =="add"? "新增账户":"编辑账户";
+      var title = operateType =="add"? "新增商品":"编辑商品信息";
       return (
        
         <Modal
@@ -51,65 +51,56 @@ const { TextArea } = Input;
           onOk={onCreate}
         >
           <Form {...formItemLayout} style={{marginLeft:"-20%"}}>
-            <Form.Item label="账户名">
-              {getFieldDecorator('accountName', {
-                rules: [{ required: true, message: '请输入账户名称!' }],
+            <Form.Item label="商品名称">
+              {getFieldDecorator('name', {
+                rules: [{ required: true, message: '请输入商品名称!' }],
               })(
-                <Input/>
+                <Input placeholder="请输入商品名称"/>
               )}
             </Form.Item>
-            <Form.Item label="用户名">
-              {getFieldDecorator('userName',{
-                rules: [{ required: true, message: '请输入用户名!' }],
-              })(<Input/>)}
+            <Form.Item label="商品型号">
+              {getFieldDecorator('model',{
+                rules: [{ required: true, message: '请输入商品型号!' }],
+              })(<Input placeholder="请输入商品型号"/>)}
             </Form.Item>
-            <Form.Item label="账户类型">
-              {getFieldDecorator('accountType', {
-                 rules: [{ required: true, message: '请选择账户类型!' }]
+            <Form.Item label="商品类型">
+              {getFieldDecorator('type', {
+                 rules: [{ required: true, message: '请选择商品类型!' }]
               })(
                 <Select
-                  placeholder= "请选择账户类型"
+                  placeholder= "请选择商品类型"
                   style={{}}
                   defaultActiveFirstOption={false}
                   showArrow={true}
                   filterOption={false}
+                  // value=
                     >
                   {options}
                 </Select>
               )}
             </Form.Item>
-            <Form.Item label="账户密码">
-              {getFieldDecorator('passWord',{
-                rules: [{ required: true, message: '请输入账户密码!' }],
-              })(<Input.Password placeholder="请输入账户密码" />)}
+            <Form.Item label="商品品牌">
+              {getFieldDecorator('brand',{
+                rules: [{ required: true, message: '商品品牌!' }],
+              })(<Input placeholder="请输入商品品牌" />)}
             </Form.Item>
-            <Form.Item label="注册邮箱">
-              {getFieldDecorator('email',{
-                rules: [{ type: 'email', message: '请输入正确的邮箱地址!'}],
-              })(<Input/>)}
+            <Form.Item label="商品颜色">
+              {getFieldDecorator('color',{
+                rules: [],
+              })(<Input placeholder="请输入商品颜色"/>)}
             </Form.Item>
-            <Form.Item label="手机号">
-              {getFieldDecorator('phoneNum',{
+            <Form.Item label="商品产地">
+              {getFieldDecorator('origin',{
                 rules: [{ }],
-              })(<Input/>)}
+              })(<Input placeholder="请输入商品产地"/>)}
             </Form.Item>
-            <Form.Item label="网站地址">
-              {getFieldDecorator('url',{
-                rules: [{ type: 'url', message: '请输入正确的网址!'}],
-              })(<Input/>)}
-            </Form.Item>
-            <Form.Item label="注册时间" >
-          {getFieldDecorator('registrationTime', {rules: [{ type: 'object', message: '请选择正确的注册时间!' }]})
-            (<DatePicker placeholder = "请选择注册时间" showTime format="YYYY-MM-DD HH:mm:ss" style={{width:"100%"}}/>
-          )}
-        </Form.Item>
-        <Form.Item label="备注">
+            <Form.Item label="备注">
               {getFieldDecorator('remarks',{
                
-              })(<Input.TextArea />)}
+              })(<Input.TextArea placeholder="备注信息" />)}
             </Form.Item>
             <Form.Item >
-              {getFieldDecorator('accountId',{
+              {getFieldDecorator('goodId',{
                
               })(<Input type="hidden"/>)}
             </Form.Item>
@@ -119,15 +110,15 @@ const { TextArea } = Input;
     }
   }
 );
-@connect(({ account,user }) => ({
-  accountList: account.accountList,
-  total: account.total,
-  direction:account.direction,
-  addAccountResult:account.addAccountResult,
+@connect(({ market,user }) => ({
+  goodsList: market.goodsList,
+  total: market.total,
+   direction:market.direction,
+   addGoodsResult:market.addGoodsResult,
   currentUser:user.currentUser,
 }))
 @Form.create()
-class Accountmanage extends PureComponent {
+class Goodsmanage extends PureComponent {
   state = {
     loading: false,
     formvisible:false,
@@ -149,30 +140,28 @@ class Accountmanage extends PureComponent {
      }
     }
   });
-   //查字典（账户类型）
-   dispatch({
-    type: 'account/queryDirections',
-    payload: {
-      dictTypeId: 1,
-    },
-    callback: () => {
-      const {direction} = this.props;
-      console.log(direction);
-    }
-  });
+    //查字典（账户类型）
     dispatch({
-      type: 'account/queryAccount',
+      type: 'market/queryDirections',
+      payload: {
+        dictTypeId: 2,
+      },
+      callback: () => {
+        const {direction} = this.props;
+        console.log(direction);
+      }
+    });
+    dispatch({
+      type: 'market/queryGoods',
       payload: {
         page: 1,
         rows: 10,
       },
       callback: () => {
-        const { accountList } = this.props;
-        console.log(accountList);
-        console.log(account);
+        const { goodsList } = this.props;
       }
     });
-    
+   
 
   }
 
@@ -180,7 +169,7 @@ class Accountmanage extends PureComponent {
   onShowSizeChange = (current, size) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'account/queryAccount',
+      type: 'market/queryGoods',
       payload: {
         page: current,
         rows: size,
@@ -191,7 +180,7 @@ class Accountmanage extends PureComponent {
   onChange = (page, pageSize) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'account/queryAccount',
+      type: 'market/queryGoods',
       payload: {
         page: page,
         rows: pageSize,
@@ -207,7 +196,7 @@ class Accountmanage extends PureComponent {
       values.page = 1;
       values.rows= 10;
       dispatch({
-        type: 'account/queryAccount',
+        type: 'market/queryGoods',
         payload: values,
       });
   };
@@ -220,6 +209,8 @@ class Accountmanage extends PureComponent {
   //编辑选中项
   editSelectRow = e =>{
     const {selectedRows} = this.state;
+    const {direction } = this.props;
+    debugger;
     const form = this.formRef.props.form;
     if(selectedRows.length != 1){
       message.error('请选择一个账户进行修改操作！');
@@ -228,12 +219,17 @@ class Accountmanage extends PureComponent {
     this.setState({operateType:"edit"});
     this.showModal();
     var row = selectedRows[0];
-    var moment = Moment(row.registrationTime,'YYYY-MM-DD HH:mm:ss');
-    row["registrationTime"] = moment;
+    // var goodsType = row['type'];
+    // direction.map((d) =>{
+    //   if(goodsType == d.id){
+    //    goodsType = d.text;
+    //   }
+    // } )
+    // row['type'] = goodsType;
     form.setFieldsValue(row);
     //下拉框的值单独回显，否则不能选中，会直接显示的option的key
-    var accountType = row['accountType']+'';
-    form.setFieldsValue({accountType:accountType });
+    var goodsType = row['type']+'';
+    form.setFieldsValue({type:goodsType });
    
   }
   //删除选中项
@@ -245,11 +241,12 @@ class Accountmanage extends PureComponent {
       return false;
     }
     dispatch({
-      type: 'account/deleteAccounts',
+      type: 'market/deleteGoods',
       payload: selectedRows,
       callback:() => {
-          const {addAccountResult} = this.props;
-          if(addAccountResult == "0"){
+          const {addGoodsResult} = this.props;
+          debugger;
+          if(addGoodsResult == 0){
             notification["error"]({
               placement:"bottomRight",
               message: '提示信息',
@@ -264,7 +261,7 @@ class Accountmanage extends PureComponent {
           }
           //刷新表格
           dispatch({
-            type: 'account/queryAccount',
+            type: 'market/queryGoods',
             payload: {
               page: 1,
               rows: 10,
@@ -274,19 +271,20 @@ class Accountmanage extends PureComponent {
       }
     });
   }
-
+  
+  
   //导出表格数据到excel文件
   exportAccount = e => {
     const { dispatch, form } = this.props;
     const values = form.getFieldsValue();
-    const accountName = values.accountName ? values.accountName : "";
-    const userName = values.userName ? values.userName : "";
-    //  window.location.href = "http://localhost:8080/exportAccount?accountName="+accountName+"&userName="+userName
+    const name = values.name ? values.name : "";
+    const model = values.model ? values.model : "";
     let dateTime = Moment().format('YYYYMMDDHHmmss');
+    //  window.location.href = "http://localhost:8080/exportAccount?accountName="+accountName+"&userName="+userName
     axios({
       method: "get",
-     // url: "http://localhost:8080/exportAccount",
-     url:  "http://"+ location.host+"/exportAccount?accountName="+accountName+"&userName="+userName,
+      url:  "http://"+ location.host+"/exportGoods?name="+name+"&model="+model,
+    //  url: "http://localhost:8080/exportGoods?name="+name+"&model="+model,
       headers: {
         // "MSP-AppKey": localStorage.getItem('appKey'),
         // "MSP-AuthKey": localStorage.getItem('auth-key'),
@@ -296,7 +294,7 @@ class Accountmanage extends PureComponent {
       const content = res.data
       console.log(res)
       const blob = new Blob([content])
-      const fileName = '账户信息表'+dateTime+'.xlsx'
+      const fileName = '商品基础信息表'+dateTime+'.xlsx';
       if ('download' in document.createElement('a')) { // 非IE下载
         const elink = document.createElement('a')
         elink.download = fileName
@@ -334,16 +332,16 @@ class Accountmanage extends PureComponent {
         return;
       }
       var values = form.getFieldsValue();
-      var registrationTime = values.registrationTime;
-      registrationTime = registrationTime.format('YYYY-MM-DD HH:mm:ss');
-      values["registrationTime"] = registrationTime;
+      // var registrationTime = values.registrationTime;
+      // registrationTime = registrationTime.format('YYYY-MM-DD HH:mm:ss');
+      // values["registrationTime"] = registrationTime;
       const {operateType} = this.state;
       var url;
       if(operateType ==  "add"){
-        var url = 'account/addAccount';
+        var url = 'market/addGoods';
       }
       if(operateType ==  "edit"){
-        var url = 'account/modifyAccount';
+        var url = 'market/modifyGoods';
       }
       dispatch({
         type: url,
@@ -365,15 +363,14 @@ class Accountmanage extends PureComponent {
             }
             //刷新表格
             dispatch({
-              type: 'account/queryAccount',
+              type: 'market/queryGoods',
               payload: {
                 page: 1,
                 rows: 10,
               },
             });
-             //恢复被选中项
-             this.setState({selectedRows:[],selectedRowKeys:[]});
-
+            //恢复被选中项
+            this.setState({selectedRows:[],selectedRowKeys:[]});
         }
       });
 
@@ -396,76 +393,67 @@ class Accountmanage extends PureComponent {
   }
 
   render() {
+    const { goodsList, total, form,direction } = this.props;
     const columns = [{
-      title: '账号名称',
-      dataIndex: 'accountName',
+      title: '商品名称',
+      dataIndex: 'name',
     }, {
-      title: '用户名',
-      dataIndex: 'userName',
-    },
-    {
-      title: '账户类型',
-      dataIndex: 'accountType',
+      title: '所属类别',
+      dataIndex: 'type', 
       render: (text, record, index) => {
-        var accountType = text;
+        var goodsType = text;
         direction.map((d) =>{
           if(text == d.id){
-            accountType = d.text;
+           goodsType = d.text;
           }
         } )
-        return accountType;
+        return goodsType;
       }
     },
     {
-      title: '用户密码',
-      dataIndex: 'passWord',
+      title: '商品品牌',
+      dataIndex: 'brand',
+    },
+    {
+      title: '商品型号',
+      dataIndex: 'model',
       
     }
       ,
     {
-      title: '注册邮箱',
-      dataIndex: 'email',
+      title: '商品颜色',
+      dataIndex: 'color',
     }
       ,
     {
-      title: '注册手机号',
-      dataIndex: 'phoneNum',
+      title: '商品产地',
+      dataIndex: 'origin',
     }
-      ,
+       ,
     {
-      title: '网站地址',
-      dataIndex: 'url',
-    }
-      ,
-    {
-      title: '注册时间',
-      dataIndex: 'registrationTime',
-    }
-      ,
-    {
-      title: '账号修改时间',
-      dataIndex: 'modificationTime',
+      title: '录入时间',
+      dataIndex: 'updateTime',
     },
     {
       title: '备注',
       dataIndex: 'remarks',
     }
     ];
-    const { accountList, total, form,direction } = this.props;
+    
     const {operateType,selectedRowKeys} = this.state;
     return (
       <div>
         <Form onSubmit={this.handleSearch} layout="inline" style={{marginBottom:"1%",marginLeft:"1%"}}>
           <Row >
             <Col span={5}>
-              <FormItem label="账户名称">
-                {form.getFieldDecorator('accountName')(<Input placeholder="请输入账户名称" />)}
+              <FormItem label="商品名称">
+                {form.getFieldDecorator('name')(<Input placeholder="请输入账户名称" />)}
               </FormItem>
             </Col>
             <Col span={5}>
-              <FormItem label="用户名">
-                {form.getFieldDecorator('userName')(
-                  <Input placeholder="请输入用户名" />
+              <FormItem label="商品型号">
+                {form.getFieldDecorator('model')(
+                  <Input placeholder="请输入商品型号" />
                 )}
               </FormItem>
             </Col>
@@ -486,10 +474,12 @@ class Accountmanage extends PureComponent {
           </Row>
         </Form>
         <Table 
-          rowSelection={{onChange: (selectedRowKeys, selectedRows) => {this.setState({selectedRows:selectedRows,selectedRowKeys:selectedRowKeys}) ;},
+          rowSelection={{
+            onChange: (selectedRowKeys, selectedRows) => {
+                       this.setState({selectedRows:selectedRows,selectedRowKeys:selectedRowKeys}) ;},
           selectedRowKeys:selectedRowKeys
         }} 
-          columns={columns} dataSource={accountList} rowKey="accountId" bordered
+          columns={columns} dataSource={goodsList} rowKey="goodsId" bordered
           pagination={{
             showSizeChanger: true, defaultCurrent: 1, total: total, defaultPageSize: 10, hideOnSinglePage: false,
             onShowSizeChange: this.onShowSizeChange,
@@ -510,4 +500,4 @@ class Accountmanage extends PureComponent {
   }
 }
 
-export default Accountmanage;
+export default Goodsmanage;

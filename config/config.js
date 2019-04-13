@@ -84,7 +84,7 @@ export default {
     '/service': {
       target: 'http://localhost:8080/service',
       changeOrigin: true,
-      pathRewrite:{'^/service':''},
+      pathRewrite: { '^/service': '' },
     },
   },
   ignoreMomentLocale: true,
