@@ -1,4 +1,4 @@
-import {queryGoods,queryDirection ,addGoods,modifyGoods,deleteGoods/*,exportGoods */} from '@/services/marketmanage'
+import {queryGoods,queryDirection ,addGoods,modifyGoods,deleteGoods,querySupplier,addSupplier,modifySupplier,deleteSupplier} from '@/services/marketmanage'
 
 export default {
     namespace: 'market',
@@ -7,6 +7,8 @@ export default {
       total:0,
        direction:[],
        addGoodsResult:"",
+       supplierList:[],
+       updateSupplierResult:"",
     },
   
     effects: {
@@ -64,19 +66,52 @@ export default {
             callback();
           }
         },
+       //查询商户信息
+       *querySupplier({payload,callback}, { call, put }) {
+        const response = yield call(querySupplier,payload);
+        yield put({
+          type: 'querySupplierList',
+          payload: response,
+        });
+        if(callback){
+          callback();
+        }
+      },
 
-    //   //导出数据
-    //   *exportAccounts({payload,callback}, { call, put }){
-    //     const response = yield call(exportAccount,payload);
-    //     // yield put({
-    //     //   type: 'addAccountResult',
-    //     //   payload: response,
-    //     // });
-    //     if(callback){
-    //       callback();
-    //     }
-    //   },
-
+      
+      //新增商户
+      *addSupplier({payload,callback}, { call, put }){
+        const response = yield call(addSupplier,payload);
+        yield put({
+          type: 'updateSupplierResult',
+          payload: response,
+        });
+        if(callback){
+          callback();
+        }
+      },
+      //修改商户信息
+      *modifySupplier({payload,callback}, { call, put }) {
+        const response = yield call(modifySupplier,payload);
+       yield put({
+         type: 'updateSupplierResult',
+         payload: response,
+       });
+       if(callback){
+         callback();
+       }
+     }, 
+     //删除商户信息
+     *deleteSupplier({payload,callback}, { call, put }){
+      const response = yield call(deleteSupplier,payload);
+      yield put({
+        type: 'updateSupplierResult',
+        payload: response,
+      });
+      if(callback){
+        callback();
+      }
+    },
 
  
     },
@@ -102,7 +137,19 @@ export default {
            addGoodsResult: action.payload ? action.payload :"" ,
          };
        },
-
+       querySupplierList(state, action) {
+        return {
+          ...state,
+          supplierList: action.payload ? action.payload.rows :[] ,
+          total:action.payload ? action.payload.total:0,
+        };
+      },
+      updateSupplierResult(state, action) {
+        return {
+          ...state,
+          updateSupplierResult: action.payload ? action.payload :"" ,
+        };
+      },
 
     
     },

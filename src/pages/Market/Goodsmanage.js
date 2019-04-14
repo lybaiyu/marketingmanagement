@@ -210,7 +210,6 @@ class Goodsmanage extends PureComponent {
   editSelectRow = e =>{
     const {selectedRows} = this.state;
     const {direction } = this.props;
-    debugger;
     const form = this.formRef.props.form;
     if(selectedRows.length != 1){
       message.error('请选择一个账户进行修改操作！');
@@ -245,7 +244,6 @@ class Goodsmanage extends PureComponent {
       payload: selectedRows,
       callback:() => {
           const {addGoodsResult} = this.props;
-          debugger;
           if(addGoodsResult == 0){
             notification["error"]({
               placement:"bottomRight",
