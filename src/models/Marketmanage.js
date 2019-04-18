@@ -1,4 +1,6 @@
-import {queryGoods,queryDirection ,addGoods,modifyGoods,deleteGoods,querySupplier,addSupplier,modifySupplier,deleteSupplier} from '@/services/marketmanage'
+import {queryGoods,queryDirection ,addGoods,modifyGoods,deleteGoods,querySupplier,addSupplier,modifySupplier,deleteSupplier,
+  queryPurchase,addPurchase,deletePurchase
+} from '@/services/marketmanage'
 
 export default {
     namespace: 'market',
@@ -9,6 +11,8 @@ export default {
        addGoodsResult:"",
        supplierList:[],
        updateSupplierResult:"",
+       purchaseList:[],
+       updatePurchaseResult:"",
     },
   
     effects: {
@@ -113,6 +117,43 @@ export default {
       }
     },
 
+     //查询采购记录
+     *queryPurchase({payload,callback}, { call, put }) {
+      const response = yield call(queryPurchase,payload);
+      yield put({
+        type: 'queryPurchaseList',
+        payload: response,
+      });
+      if(callback){
+        callback();
+      }
+    },
+
+   //新增采购记录
+   *addPurchase({payload,callback}, { call, put }){
+    const response = yield call(addPurchase,payload);
+    yield put({
+      type: 'updatePurchaseResult',
+      payload: response,
+    });
+    if(callback){
+      callback();
+    }
+  },
+  //删除采购记录 
+  *deletePurchase({payload,callback}, { call, put }){
+    const response = yield call(deletePurchase,payload);
+    yield put({
+      type: 'updatePurchaseResult',
+      payload: response,
+    });
+    if(callback){
+      callback();
+    }
+  },
+
+
+
  
     },
   
@@ -150,6 +191,24 @@ export default {
           updateSupplierResult: action.payload ? action.payload :"" ,
         };
       },
+      //返回采购记录
+      queryPurchaseList(state, action) {
+        return {
+          ...state,
+          purchaseList: action.payload ? action.payload.rows :[] ,
+          total:action.payload ? action.payload.total:0,
+        };
+      },
+      //编辑采购记录的结果
+      updatePurchaseResult(state, action) {
+        return {
+          ...state,
+          updatePurchaseResult: action.payload ? action.payload :"" ,
+        };
+      },
+      
+   
+
 
     
     },

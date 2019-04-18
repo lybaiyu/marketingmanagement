@@ -83,3 +83,34 @@ export async function queryGoods(params) {
       });
     }
 
+    //查询采购记录
+    export async function queryPurchase(params) {
+      return request('/service/queryPurchase/',
+      {
+      method:"post",
+      body: JSON.stringify(params),
+      headers:{'Content-Type': 'application/json;charset=utf-8'}
+      });
+    }
+
+    //新增采购记录
+    export async function addPurchase(params) {
+      return request('/service/addPurchase/',
+      {
+      method:"post",
+      body: JSON.stringify(params),
+      headers:{'Content-Type': 'application/json;charset=utf-8'}
+      });
+    }
+
+    //删除采购记录
+    
+    export async function deletePurchase(params) {
+      return request('/service/deletePurchase/',
+      {
+      method:"post",
+      body: JSON.stringify(params),
+      headers:{'Content-Type': 'application/json;charset=utf-8'}
+      });
+    }
+

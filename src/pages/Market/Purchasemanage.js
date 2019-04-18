@@ -1,3 +1,4 @@
+// 采购记录管理页面
 import React, { PureComponent } from 'react';
 import { findDOMNode } from 'react-dom';
 //import moment from 'moment';
@@ -9,6 +10,10 @@ import Moment from 'moment';
 import router from 'umi/router';
 //import 'moment/locale/zh-cn';
 import axios from 'axios'
+import $ from  'jquery'
+import jsonp from 'fetch-jsonp';
+import querystring from 'querystring';
+
 message.config({
     top: 300,
     duration: 2,
@@ -18,18 +23,111 @@ message.config({
 //moment.locale('zh-cn');
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const Option = Select.Option;
+let timeout;
+let currentValue;
+
+function fetch(value) {
+ var allGoods = [];
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/service/queryGoods",
+        contentType: "application/json",
+        dataType: "JSON",
+        async: false,
+        data: JSON.stringify({ "name": value }),
+        success: function (data) {
+            var list = data.rows;
+            if (list.length > 0) {
+                list.forEach((r) => {
+                    allGoods.push({
+                        value: r["goodId"],
+                        text: r["name"],
+                    });
+                });
+
+            }
+         
+        }
+
+    });
+    return  allGoods;
+}
+
+//搜索供应商（可搜索下拉框用）
+function fetch2(value) {
+    var allquerySupplier = [];
+       $.ajax({
+           type: "POST",
+           url: "http://localhost:8080/service/querySupplier",
+           contentType: "application/json",
+           dataType: "JSON",
+           async: false,
+           data: JSON.stringify({ "name": value }),
+           success: function (data) {
+               debugger;
+               var list = data.rows;
+               console.log("data2"+JSON.stringify(list));
+               if (list.length > 0) {
+                   list.forEach((r) => {
+                    allquerySupplier.push({
+                        value: r["supplierId"],
+                        text: r["supplierName"],
+                       });
+                   });
+   
+               }
+            
+           }
+   
+       });
+       return  allquerySupplier;
+   }
 
 //表单弹窗
 const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
     // eslint-disable-next-line
 
-    class extends React.Component {
+    class formPage extends React.Component {
+        state = {
+            data: [],
+            value: undefined,
+            data2: [],
+            value2: undefined,
+          }
+          //搜索商品下拉框函数
+          handleSearch = (value) => {
+          let list =  fetch(value);
+          if(list.length > 0){
+            debugger;
+            this.setState({ data:list }) ;
+          }
+         
+          }
+          handleChange = (value) => {
+            this.setState({ value });
+          }
+          //搜索供货商下拉框函数
+          handleSearch2 = (value) => {
+            let list =  fetch2(value);
+            if(list.length > 0){
+              debugger;
+              this.setState({ data2:list }) ;
+            }
+           
+            }
+            handleChange2 = (value) => {
+              this.setState({ value2:value });
+            }
+
+
         render() {
             const {
                 visible, onCancel, onCreate, form, direction, operateType
             } = this.props;
+            const options = this.state.data.map(d => <Option key={d.value}>{d.text}</Option>);
+            const options2 = this.state.data2.map(d => <Option key={d.value}>{d.text}</Option>);
             const { getFieldDecorator } = form;
-            const options = direction.length > 0 ? direction.map(d => <Option key={d.id}>{d.text}</Option>) : "";
             const formItemLayout = {
                 labelCol: {
                     xs: { span: 8 },
@@ -40,7 +138,7 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                     sm: { span: 15 },
                 },
             };
-            var title = operateType == "add" ? "新增商户" : "编辑商户信息";
+            var title = operateType == "add" ? "新增采购记录" : "编辑采购记录信息";
             return (
 
                 <Modal
@@ -51,65 +149,70 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                     onOk={onCreate}
                 >
                     <Form {...formItemLayout} style={{ marginLeft: "-20%" }}>
-                        <Form.Item label="商户名称">
-                            {getFieldDecorator('supplierName', {
-                                rules: [{ required: true, message: '商户名称不能为空!' }],
-                            })(
-                                <Input placeholder="请输入商户名称" />
-                            )}
-                        </Form.Item>
-                       
-                        <Form.Item label="商户类别">
-                            {getFieldDecorator('type', {
-                                rules: [{ required: true, message: '商户类别不能为空!' }]
+                        <Form.Item label="商品名称">
+                            {getFieldDecorator('goodsName', {
+                                rules: [{ required: true, message: '商品名称不能为空!' }],
                             })(
                                 <Select
-                                    placeholder="请选择商户类别"
-                                    style={{}}
+                                    showSearch
+                                    value={this.state.value}
+                                    placeholder={"请搜索选择商品名称"}
+                                    style={this.props.style}
                                     defaultActiveFirstOption={false}
                                     showArrow={true}
                                     filterOption={false}
-                                // value=
-                                >
-                                    {options}
+                                    onSearch={this.handleSearch}
+                                    onChange={this.handleChange}
+                                    notFoundContent={null}
+                                    >
+                                  {options}
                                 </Select>
                             )}
                         </Form.Item>
+                        <Form.Item label="购入数量">
+                            {getFieldDecorator('num', {
+                                rules: [{required: true, message: '购入数量不能为空!' },{type:"number", message: '只能输入数字' , transform:(value)=> {return Number(value)}}]
+                            })(
+                                <Input placeholder="请输入购入数量"  type="number"/>
+                            )}
+                        </Form.Item>
 
-                        <Form.Item label="联系人">
-                            {getFieldDecorator('contactName', {
+                        <Form.Item label="商品单价">
+                            {getFieldDecorator('goodsPrice', {
+                                rules: [{required: true, message: '商品单价不能为空!' }],
+                            })(<Input placeholder="请输入商品单价" />)}
+                        </Form.Item>
+                        <Form.Item label="建议售价">
+                            {getFieldDecorator('guidePrice', {
                                 rules: [],
-                            })(<Input placeholder="请输入联系人姓名" />)}
+                            })(<Input placeholder="请输入建议售价" />)}
                         </Form.Item>
-                        <Form.Item label="联系电话1">
-                            {getFieldDecorator('phone1', {
-                                rules: [],
-                            })(<Input placeholder="请输入联系电话" />)}
-                        </Form.Item>
-                        <Form.Item label="联系电话2">
-                            {getFieldDecorator('phone2', {
+                        <Form.Item label="供货商">
+                            {getFieldDecorator('supplierName', {
                                 rules: [{}],
-                            })(<Input placeholder="请输入联系电话" />)}
+                            })(
+                                   <Select
+                                    showSearch
+                                    value={this.state.value2}
+                                    placeholder={"请搜索选择供货商"}
+                                    style={this.props.style}
+                                    defaultActiveFirstOption={false}
+                                    showArrow={true}
+                                    filterOption={false}
+                                    onSearch={this.handleSearch2}
+                                    onChange={this.handleChange2}
+                                    notFoundContent={null}
+                                    >
+                                  {options2}
+                                </Select>
+
+                            )}
                         </Form.Item>
-                        <Form.Item label="微信">
-                            {getFieldDecorator('wechat', {
-                                rules: [{}],
-                            })(<Input placeholder="请输入微信号" />)}
-                        </Form.Item>
-                        <Form.Item label="QQ">
-                            {getFieldDecorator('qq', {
-                                rules: [{}],
-                            })(<Input placeholder="请输入QQ号" />)}
-                        </Form.Item>
-                        <Form.Item label="邮箱">
-                            {getFieldDecorator('email', {
-                                rules: [{}],
-                            })(<Input placeholder="请输入邮箱地址" />)}
-                        </Form.Item>
-                        <Form.Item label="店铺地址">
-                            {getFieldDecorator('address', {
-                                rules: [{}],
-                            })(<Input placeholder="请输入店铺地址" />)}
+
+                        <Form.Item label="采购日期">
+                            {getFieldDecorator('purchaseDate', {
+                                
+                            })(<DatePicker  placeholder="请选择采购日期"  style={{width:"100%"}}/>  )}
                         </Form.Item>
                         <Form.Item label="备注">
                             {getFieldDecorator('remarks', {
@@ -117,7 +220,7 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                             })(<Input.TextArea placeholder="备注信息" />)}
                         </Form.Item>
                         <Form.Item >
-                            {getFieldDecorator('supplierId', {
+                            {getFieldDecorator('purchaseId', {
 
                             })(<Input type="hidden" />)}
                         </Form.Item>
@@ -126,16 +229,18 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
             );
         }
     }
+    
 );
 @connect(({ market, user }) => ({
-    supplierList: market.supplierList,
+    purchaseList: market.purchaseList,
     total: market.total,
     direction: market.direction,
-    updateSupplierResult:market.updateSupplierResult,
+    updatePurchaseResult: market.updatePurchaseResult,
     currentUser: user.currentUser,
+    goodsList: market.goodsList,
 }))
 @Form.create()
-class Suppliermanage extends PureComponent {
+class Purchasemanage extends PureComponent {
     state = {
         loading: false,
         formvisible: false,
@@ -157,25 +262,25 @@ class Suppliermanage extends PureComponent {
                 }
             }
         });
-        //查字典（账户类型）
+        // //查字典（账户类型）
+        // dispatch({
+        //     type: 'market/queryDirections',
+        //     payload: {
+        //         dictTypeId: 3,
+        //     },
+        //     callback: () => {
+        //         const { direction } = this.props;
+        //         console.log(direction);
+        //     }
+        // });
         dispatch({
-            type: 'market/queryDirections',
-            payload: {
-                dictTypeId: 3,
-            },
-            callback: () => {
-                const { direction } = this.props;
-                console.log(direction);
-            }
-        });
-        dispatch({
-            type: 'market/querySupplier',
+            type: 'market/queryPurchase',
             payload: {
                 page: 1,
                 rows: 10,
             },
             callback: () => {
-                const { supplierList } = this.props;
+                const { purchaseList } = this.props;
             }
         });
 
@@ -186,7 +291,7 @@ class Suppliermanage extends PureComponent {
     onShowSizeChange = (current, size) => {
         const { dispatch } = this.props;
         dispatch({
-            type: 'market/querySupplier',
+            type: 'market/queryPurchase',
             payload: {
                 page: current,
                 rows: size,
@@ -197,7 +302,7 @@ class Suppliermanage extends PureComponent {
     onChange = (page, pageSize) => {
         const { dispatch } = this.props;
         dispatch({
-            type: 'market/querySupplier',
+            type: 'market/queryPurchase',
             payload: {
                 page: page,
                 rows: pageSize,
@@ -210,15 +315,20 @@ class Suppliermanage extends PureComponent {
         e.preventDefault();
         const { dispatch, form } = this.props;
         const values = form.getFieldsValue();
+        let purchaseDate = values.purchaseDate
+        if(purchaseDate != "" && purchaseDate != null && purchaseDate != undefined){
+            purchaseDate = purchaseDate.format('YYYY-MM-DD');
+        }
+        values['purchaseDate']  = purchaseDate;
         values.page = 1;
         values.rows = 10;
         dispatch({
-            type: 'market/querySupplier',
+            type: 'market/queryPurchase',
             payload: values,
         });
     };
 
-    //新增账户
+    //新增采购记录
     addAccount = e => {
         this.setState({ operateType: "add" });
         this.showModal();
@@ -235,13 +345,6 @@ class Suppliermanage extends PureComponent {
         this.setState({ operateType: "edit" });
         this.showModal();
         var row = selectedRows[0];
-        // var goodsType = row['type'];
-        // direction.map((d) =>{
-        //   if(goodsType == d.id){
-        //    goodsType = d.text;
-        //   }
-        // } )
-        // row['type'] = goodsType;
         form.setFieldsValue(row);
         //下拉框的值单独回显，否则不能选中，会直接显示的option的key
         var goodsType = row['type'] + '';
@@ -256,12 +359,16 @@ class Suppliermanage extends PureComponent {
             message.error('请选择要删除的项目！');
             return false;
         }
+        if (selectedRows.length > 1) {
+            message.error('采购记录只能逐条删除！');
+            return false;
+        }
         dispatch({
-            type: 'market/deleteSupplier',
+            type: 'market/deletePurchase',
             payload: selectedRows,
             callback: () => {
-                const { updateSupplierResult } = this.props;
-                if (updateSupplierResult == 0) {
+                const { updatePurchaseResult } = this.props;
+                if (updatePurchaseResult == 0) {
                     notification["error"]({
                         placement: "bottomRight",
                         message: '提示信息',
@@ -276,7 +383,7 @@ class Suppliermanage extends PureComponent {
                 }
                 //刷新表格
                 dispatch({
-                    type: 'market/querySupplier',
+                    type: 'market/queryPurchase',
                     payload: {
                         page: 1,
                         rows: 10,
@@ -292,12 +399,18 @@ class Suppliermanage extends PureComponent {
     exportAccount = e => {
         const { dispatch, form } = this.props;
         const values = form.getFieldsValue();
+        let purchaseDate = values.purchaseDate
+        if(purchaseDate != "" && purchaseDate != null && purchaseDate != undefined){
+            purchaseDate = purchaseDate.format('YYYY-MM-DD');
+        }
+        purchaseDate = purchaseDate ? purchaseDate :"";
+        const goodsName = values.goodsName ? values.goodsName : "";
         const supplierName = values.supplierName ? values.supplierName : "";
         let dateTime = Moment().format('YYYYMMDDHHmmss');
         axios({
             method: "get",
-         //   url: "http://" + location.host + "/exportSupplier?name=" + name + "&model=" + model,
-             url: "http://localhost:8080/exportSupplier?supplierName="+supplierName,
+            url: "http://" + location.host + "/exportPurchase?supplierName=" + supplierName + "&goodsName="+goodsName+"&purchaseDate="+purchaseDate,
+            //url: "http://localhost:8080/exportPurchase?supplierName=" + supplierName+"&goodsName="+goodsName+"&purchaseDate="+purchaseDate,
             headers: {
                 // "MSP-AppKey": localStorage.getItem('appKey'),
                 // "MSP-AuthKey": localStorage.getItem('auth-key'),
@@ -307,7 +420,7 @@ class Suppliermanage extends PureComponent {
             const content = res.data
             console.log(res)
             const blob = new Blob([content])
-            const fileName = '供货商信息表' + dateTime + '.xlsx';
+            const fileName = '商品采购记录明细表' + dateTime + '.xlsx';
             if ('download' in document.createElement('a')) { // 非IE下载
                 const elink = document.createElement('a')
                 elink.download = fileName
@@ -336,7 +449,7 @@ class Suppliermanage extends PureComponent {
     }
 
 
-    //新增&保存账户信息
+    //新增&保存
     handleCreate = () => {
         const { dispatch } = this.props;
         const form = this.formRef.props.form;
@@ -346,19 +459,22 @@ class Suppliermanage extends PureComponent {
             }
             var values = form.getFieldsValue();
             const { operateType } = this.state;
+              var purchaseDate = values.purchaseDate;
+              purchaseDate = purchaseDate.format('YYYY-MM-DD');
+              values["purchaseDate"] = purchaseDate;
             var url;
             if (operateType == "add") {
-                var url = 'market/addSupplier';
+                var url = 'market/addPurchase';
             }
-            if (operateType == "edit") {
-                var url = 'market/modifySupplier';
-            }
+            // if (operateType == "edit") {
+            //     var url = 'market/modifySupplier';
+            // }
             dispatch({
                 type: url,
                 payload: values,
                 callback: () => {
-                    const { addAccountResult } = this.props;
-                    if (addAccountResult == "0") {
+                    const { updatePurchaseResult } = this.props;
+                    if (updatePurchaseResult == 0) {
                         notification["error"]({
                             placement: "bottomRight",
                             message: '提示信息',
@@ -373,7 +489,7 @@ class Suppliermanage extends PureComponent {
                     }
                     //刷新表格
                     dispatch({
-                        type: 'market/querySupplier',
+                        type: 'market/queryPurchase',
                         payload: {
                             page: 1,
                             rows: 10,
@@ -403,66 +519,46 @@ class Suppliermanage extends PureComponent {
     }
 
     render() {
-        const { supplierList, total, form, direction } = this.props;
+        const { purchaseList, total, form, direction } = this.props;
         const columns = [{
-            title: '商户名称',
+            title: '商品名称',
+            dataIndex: 'goodsName',
+        },
+        {
+            title: '购入数量',
+            dataIndex: 'num',
+        },
+        {
+            title: '商品单价',
+            dataIndex: 'goodsPrice',
+        },
+        {
+            title: '总价',
+            dataIndex: 'totalPrice',
+        }
+            ,
+        {
+            title: '建议售价',
+            dataIndex: 'guidePrice',
+        }
+            ,
+        {
+            title: '供货商',
             dataIndex: 'supplierName',
-        },
-        {
-            title: '商户类别',
-            dataIndex: 'type',
-            render: (text, record, index) => {
-                var goodsType = text;
-                direction.map((d) => {
-                    if (text == d.id) {
-                        goodsType = d.text;
-                    }
-                })
-                return goodsType;
-            }
-        },
-        {
-            title: '联系人',
-            dataIndex: 'contactName',
-        },
-        {
-            title: '联系电话1',
-            dataIndex: 'phone1',
-
         }
             ,
         {
-            title: '联系电话2',
-            dataIndex: 'phone2',
-        }
-            ,
-        {
-            title: '微信号',
-            dataIndex: 'wechat',
-        }
-            ,
-        {
-            title: '地址',
-            dataIndex: 'address',
-        },
-        {
-            title: 'QQ',
-            dataIndex: 'qq',
-        },
-        {
-            title: '邮箱',
-            dataIndex: 'email',
+            title: '采购日期',
+            dataIndex: 'purchaseDate',
         },
         {
             title: '备注',
             dataIndex: 'remarks',
         },
-        
         {
-          title: '录入时间',
-          dataIndex: 'updateTime',
+            title: '录入时间',
+            dataIndex: 'updateTime',
         },
-        
 
         ];
 
@@ -471,29 +567,36 @@ class Suppliermanage extends PureComponent {
             <div>
                 <Form onSubmit={this.handleSearch} layout="inline" style={{ marginBottom: "1%", marginLeft: "1%" }}>
                     <Row >
-                        <Col span={5} style={{marginTop:"-2px"}}>
+                        <Col span={4}>
+                            <FormItem label="商品名称">
+                                {form.getFieldDecorator('goodsName')(
+                                    <Input placeholder="请输入商品名称" />
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={4} style={{ marginTop: "-2px" }}>
                             <FormItem label="供货商名称">
                                 {form.getFieldDecorator('supplierName')(<Input placeholder="请输入供货商名称" />)}
                             </FormItem>
                         </Col>
+
+                        <Col span={4}>
+                            <FormItem label="采购日期">
+                                {form.getFieldDecorator('purchaseDate')(
+                                    <DatePicker  placeholder="请选择采购日期" />
+                                )}
+                            </FormItem>
+                        </Col>
                         <Col span={2}>
-                            <div style={{ marginLeft: "-50%" }}>
+                            <div style={{ marginLeft: "-10%",marginTop:3 }}>
                                 <Button type="primary" icon="search" onClick={this.handleSearch}>搜索</Button>
                             </div>
                         </Col>
-                        <Col span={5}>
-                            {/* <FormItem label="商品型号">
-                                {form.getFieldDecorator('model')(
-                                    <Input placeholder="请输入商品型号" />
-                                )}
-                            </FormItem> */}
-                        </Col>
 
-                        
-                        <Col span={12}>
+                        <Col span={10}>
                             <div style={{ float: "right", marginRight: 0 }}>
                                 <Button type="primary" icon="plus" onClick={this.addAccount}>新增</Button>
-                                <Button type="primary" icon="edit" onClick={this.editSelectRow} style={{ marginLeft: 8 }}>修改</Button>
+                                {/* <Button type="primary" icon="edit" onClick={this.editSelectRow} style={{ marginLeft: 8 }}>修改</Button> */}
                                 <Button type="primary" icon="delete" onClick={this.deleteSelectRow} style={{ marginLeft: 8 }}>删除</Button>
                                 <Button type="primary" icon="printer" onClick={this.exportAccount} style={{ marginLeft: 8 }}>导出</Button>
                             </div>
@@ -501,13 +604,13 @@ class Suppliermanage extends PureComponent {
                     </Row>
                 </Form>
                 <Table
-                    rowSelection={{
+                     rowSelection={{
                         onChange: (selectedRowKeys, selectedRows) => {
-                            this.setState({ selectedRows: selectedRows, selectedRowKeys: selectedRowKeys });
-                        },
-                        selectedRowKeys: selectedRowKeys
-                    }}
-                    columns={columns} dataSource={supplierList} rowKey="goodsId" bordered
+                            debugger;
+                                   this.setState({selectedRows:selectedRows,selectedRowKeys:selectedRowKeys}) ;},
+                      selectedRowKeys:selectedRowKeys
+                    }} 
+                    columns={columns} dataSource={purchaseList} rowKey="goodsId" bordered
                     pagination={{
                         showSizeChanger: true, defaultCurrent: 1, total: total, defaultPageSize: 10, hideOnSinglePage: false,
                         onShowSizeChange: this.onShowSizeChange,
@@ -528,4 +631,4 @@ class Suppliermanage extends PureComponent {
     }
 }
 
-export default Suppliermanage;
+export default Purchasemanage;

@@ -472,6 +472,7 @@ class Goodsmanage extends PureComponent {
           </Row>
         </Form>
         <Table 
+        
           rowSelection={{
             onChange: (selectedRowKeys, selectedRows) => {
                        this.setState({selectedRows:selectedRows,selectedRowKeys:selectedRowKeys}) ;},

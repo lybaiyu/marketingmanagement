@@ -40,6 +40,12 @@ export default [
           component: './Market/Suppliermanage',
           icon:'team'
         },
+        {
+          path: '/market/purchasemanage',
+          name: 'purchasemanage',
+          component: './Market/Purchasemanage',
+          icon:'shopping-cart'
+        },
       ],
     },
      
