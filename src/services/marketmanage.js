@@ -114,3 +114,13 @@ export async function queryGoods(params) {
       });
     }
 
+    //查询库存
+    export async function queryInventory(params) {
+      return request('/service/queryInventory/',
+      {
+      method:"post",
+      body: JSON.stringify(params),
+      headers:{'Content-Type': 'application/json;charset=utf-8'}
+      });
+    }
+

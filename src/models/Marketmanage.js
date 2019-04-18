@@ -1,5 +1,5 @@
 import {queryGoods,queryDirection ,addGoods,modifyGoods,deleteGoods,querySupplier,addSupplier,modifySupplier,deleteSupplier,
-  queryPurchase,addPurchase,deletePurchase
+  queryPurchase,addPurchase,deletePurchase,queryInventory
 } from '@/services/marketmanage'
 
 export default {
@@ -13,6 +13,7 @@ export default {
        updateSupplierResult:"",
        purchaseList:[],
        updatePurchaseResult:"",
+       inventoryList:[],
     },
   
     effects: {
@@ -151,7 +152,17 @@ export default {
       callback();
     }
   },
-
+   //查询库存
+   *queryInventory({payload,callback}, { call, put }) {
+    const response = yield call(queryInventory,payload);
+    yield put({
+      type: 'queryInventoryList',
+      payload: response,
+    });
+    if(callback){
+      callback();
+    }
+  },
 
 
  
@@ -207,7 +218,14 @@ export default {
         };
       },
       
-   
+     //返回库存列表
+     queryInventoryList(state, action) {
+      return {
+        ...state,
+        inventoryList: action.payload ? action.payload.rows :[] ,
+        total:action.payload ? action.payload.total:0,
+      };
+    },
 
 
     

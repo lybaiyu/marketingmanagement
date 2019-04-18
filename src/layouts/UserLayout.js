@@ -30,7 +30,7 @@ const links = [
 
 const copyright = (
   <Fragment>
-    Copyright <Icon type="copyright" /> 2018 蚂蚁金服体验技术部出品
+    Copyright <Icon type="copyright" />{new Date().getFullYear()} 狮子庙镇聚客隆电器专营店
   </Fragment>
 );
 

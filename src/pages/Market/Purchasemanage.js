@@ -525,6 +525,10 @@ class Purchasemanage extends PureComponent {
             dataIndex: 'goodsName',
         },
         {
+            title: '商品型号',
+            dataIndex: 'model',
+        },
+        {
             title: '购入数量',
             dataIndex: 'num',
         },

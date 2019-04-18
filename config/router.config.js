@@ -46,6 +46,12 @@ export default [
           component: './Market/Purchasemanage',
           icon:'shopping-cart'
         },
+        {
+          path: '/market/inventorymanage',
+          name: 'inventorymanage',
+          component: './Market/Inventorymanage',
+          icon:'bank'
+        },
       ],
     },
      
