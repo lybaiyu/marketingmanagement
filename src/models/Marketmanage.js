@@ -1,5 +1,5 @@
 import {queryGoods,queryDirection ,addGoods,modifyGoods,deleteGoods,querySupplier,addSupplier,modifySupplier,deleteSupplier,
-  queryPurchase,addPurchase,deletePurchase,queryInventory
+  queryPurchase,addPurchase,deletePurchase,queryInventory,querySales,addSales,deleteSales
 } from '@/services/marketmanage'
 
 export default {
@@ -14,6 +14,8 @@ export default {
        purchaseList:[],
        updatePurchaseResult:"",
        inventoryList:[],
+       salesList:[],
+       updateSalesResult:"",
     },
   
     effects: {
@@ -163,7 +165,40 @@ export default {
       callback();
     }
   },
-
+  //查询售出记录
+  *querySales({payload,callback}, { call, put }) {
+    const response = yield call(querySales,payload);
+    yield put({
+      type: 'querySalesList',
+      payload: response,
+    });
+    if(callback){
+      callback();
+    }
+  },
+   
+   //新增售出记录
+   *addSales({payload,callback}, { call, put }){
+    const response = yield call(addSales,payload);
+    yield put({
+      type: 'updateSalesResult',
+      payload: response,
+    });
+    if(callback){
+      callback();
+    }
+  },
+  //删除售出记录 
+  *deleteSales({payload,callback}, { call, put }){
+    const response = yield call(deleteSales,payload);
+    yield put({
+      type: 'updateSalesResult',
+      payload: response,
+    });
+    if(callback){
+      callback();
+    }
+  },
 
  
     },
@@ -227,7 +262,20 @@ export default {
       };
     },
 
-
-    
+    //返回售出记录列表
+    querySalesList(state, action) {
+      return {
+        ...state,
+        salesList: action.payload ? action.payload.rows :[] ,
+        total:action.payload ? action.payload.total:0,
+      };
+    },
+    //返回更新销售记录结果 
+    updateSalesResult(state, action) {
+      return {
+        ...state,
+        updateSalesResult: action.payload ? action.payload :"" ,
+      };
+    },
     },
   };

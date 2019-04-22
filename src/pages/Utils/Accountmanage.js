@@ -2,34 +2,35 @@ import React, { PureComponent } from 'react';
 import { findDOMNode } from 'react-dom';
 //import moment from 'moment';
 import { connect } from 'dva';
-import {Table,Form,Button,Pagination,Input,Row,Col,Select,Icon,Modal,Radio ,DatePicker,notification,message } from 'antd';
+import { Table, Form, Button, Pagination, Input, Row, Col, Select, Icon, Modal, Radio, DatePicker, notification, message } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import Result from '@/components/Result';
 import Moment from 'moment';
 import router from 'umi/router';
 //import 'moment/locale/zh-cn';
 import axios from 'axios'
+const confirm = Modal.confirm;
 message.config({
   top: 300,
   duration: 2,
-  maxCount: 1 ,
+  maxCount: 1,
 });
 
 //moment.locale('zh-cn');
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
- //表单弹窗
- const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
+//表单弹窗
+const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
   // eslint-disable-next-line
-  
+
   class extends React.Component {
     render() {
       const {
-        visible, onCancel, onCreate, form,direction,operateType
+        visible, onCancel, onCreate, form, direction, operateType
       } = this.props;
       const { getFieldDecorator } = form;
-      const options = direction.length >0 ? direction.map(d => <Option key={d.id}>{d.text}</Option>) :"";
+      const options = direction.length > 0 ? direction.map(d => <Option key={d.id}>{d.text}</Option>) : "";
       const formItemLayout = {
         labelCol: {
           xs: { span: 8 },
@@ -40,78 +41,78 @@ const { TextArea } = Input;
           sm: { span: 15 },
         },
       };
-      var title = operateType =="add"? "新增账户":"编辑账户";
+      var title = operateType == "add" ? "新增账户" : "编辑账户";
       return (
-       
+
         <Modal
           visible={visible}
-          title= {title}
+          title={title}
           okText="保存"
           onCancel={onCancel}
           onOk={onCreate}
         >
-          <Form {...formItemLayout} style={{marginLeft:"-20%"}}>
+          <Form {...formItemLayout} style={{ marginLeft: "-20%" }}>
             <Form.Item label="账户名">
               {getFieldDecorator('accountName', {
                 rules: [{ required: true, message: '请输入账户名称!' }],
               })(
-                <Input/>
+                <Input />
               )}
             </Form.Item>
             <Form.Item label="用户名">
-              {getFieldDecorator('userName',{
+              {getFieldDecorator('userName', {
                 rules: [{ required: true, message: '请输入用户名!' }],
-              })(<Input/>)}
+              })(<Input />)}
             </Form.Item>
             <Form.Item label="账户类型">
               {getFieldDecorator('accountType', {
-                 rules: [{ required: true, message: '请选择账户类型!' }]
+                rules: [{ required: true, message: '请选择账户类型!' }]
               })(
                 <Select
-                  placeholder= "请选择账户类型"
+                  placeholder="请选择账户类型"
                   style={{}}
                   defaultActiveFirstOption={false}
                   showArrow={true}
                   filterOption={false}
-                    >
+                >
                   {options}
                 </Select>
               )}
             </Form.Item>
             <Form.Item label="账户密码">
-              {getFieldDecorator('passWord',{
+              {getFieldDecorator('passWord', {
                 rules: [{ required: true, message: '请输入账户密码!' }],
               })(<Input.Password placeholder="请输入账户密码" />)}
             </Form.Item>
             <Form.Item label="注册邮箱">
-              {getFieldDecorator('email',{
-                rules: [{ type: 'email', message: '请输入正确的邮箱地址!'}],
-              })(<Input/>)}
+              {getFieldDecorator('email', {
+                rules: [{ type: 'email', message: '请输入正确的邮箱地址!' }],
+              })(<Input />)}
             </Form.Item>
             <Form.Item label="手机号">
-              {getFieldDecorator('phoneNum',{
-                rules: [{ }],
-              })(<Input/>)}
+              {getFieldDecorator('phoneNum', {
+                rules: [{}],
+              })(<Input />)}
             </Form.Item>
             <Form.Item label="网站地址">
-              {getFieldDecorator('url',{
-                rules: [{ type: 'url', message: '请输入正确的网址!'}],
-              })(<Input/>)}
+              {getFieldDecorator('url', {
+                rules: [{ type: 'url', message: '请输入正确的网址!' }],
+              })(<Input />)}
             </Form.Item>
             <Form.Item label="注册时间" >
-          {getFieldDecorator('registrationTime', {rules: [{ type: 'object', message: '请选择正确的注册时间!' }]})
-            (<DatePicker placeholder = "请选择注册时间" showTime format="YYYY-MM-DD HH:mm:ss" style={{width:"100%"}}/>
-          )}
-        </Form.Item>
-        <Form.Item label="备注">
-              {getFieldDecorator('remarks',{
-               
+              {getFieldDecorator('registrationTime', { rules: [{ type: 'object', message: '请选择正确的注册时间!' }] })
+                (<DatePicker placeholder="请选择注册时间" showTime format="YYYY-MM-DD HH:mm:ss" style={{ width: "100%" }} />
+                )}
+            </Form.Item>
+            <Form.Item label="备注">
+              {getFieldDecorator('remarks', {
+
               })(<Input.TextArea />)}
             </Form.Item>
             <Form.Item >
-              {getFieldDecorator('accountId',{
-               
-              })(<Input type="hidden"/>)}
+              {getFieldDecorator('accountId', {
+
+              })(<Input type="hidden" />)}
             </Form.Item>
           </Form>
         </Modal>
@@ -119,47 +120,47 @@ const { TextArea } = Input;
     }
   }
 );
-@connect(({ account,user }) => ({
+@connect(({ account, user }) => ({
   accountList: account.accountList,
   total: account.total,
-  direction:account.direction,
-  addAccountResult:account.addAccountResult,
-  currentUser:user.currentUser,
+  direction: account.direction,
+  addAccountResult: account.addAccountResult,
+  currentUser: user.currentUser,
 }))
 @Form.create()
 class Accountmanage extends PureComponent {
   state = {
     loading: false,
-    formvisible:false,
-    selectedRows:[],
-    selectedRowKeys:[],
-    operateType:"",
+    formvisible: false,
+    selectedRows: [],
+    selectedRowKeys: [],
+    operateType: "",
   };
 
   componentDidMount() {
     const { dispatch } = this.props;
-   //获取当前用户（登录状态）
-   dispatch({
-    type: 'user/fetchCurrent',
-    callback: () => {
-     const {currentUser} = this.props;
-     if(!currentUser.userName){
-    //  route.push("/user/login");
-    router.push("/user/login")
-     }
-    }
-  });
-   //查字典（账户类型）
-   dispatch({
-    type: 'account/queryDirections',
-    payload: {
-      dictTypeId: 1,
-    },
-    callback: () => {
-      const {direction} = this.props;
-      console.log(direction);
-    }
-  });
+    //获取当前用户（登录状态）
+    dispatch({
+      type: 'user/fetchCurrent',
+      callback: () => {
+        const { currentUser } = this.props;
+        if (!currentUser.userName) {
+          //  route.push("/user/login");
+          router.push("/user/login")
+        }
+      }
+    });
+    //查字典（账户类型）
+    dispatch({
+      type: 'account/queryDirections',
+      payload: {
+        dictTypeId: 1,
+      },
+      callback: () => {
+        const { direction } = this.props;
+        console.log(direction);
+      }
+    });
     dispatch({
       type: 'account/queryAccount',
       payload: {
@@ -172,7 +173,7 @@ class Accountmanage extends PureComponent {
         console.log(account);
       }
     });
-    
+
 
   }
 
@@ -198,81 +199,89 @@ class Accountmanage extends PureComponent {
       },
     });
   }
-   
+
   //手动条件搜索
   handleSearch = e => {
     e.preventDefault();
     const { dispatch, form } = this.props;
-      const values = form.getFieldsValue();
-      values.page = 1;
-      values.rows= 10;
-      dispatch({
-        type: 'account/queryAccount',
-        payload: values,
-      });
+    const values = form.getFieldsValue();
+    values.page = 1;
+    values.rows = 10;
+    dispatch({
+      type: 'account/queryAccount',
+      payload: values,
+    });
   };
 
   //新增账户
-  addAccount = e =>{
-    this.setState({operateType:"add"});
+  addAccount = e => {
+    this.setState({ operateType: "add" });
     this.showModal();
   };
   //编辑选中项
-  editSelectRow = e =>{
-    const {selectedRows} = this.state;
+  editSelectRow = e => {
+    const { selectedRows } = this.state;
     const form = this.formRef.props.form;
-    if(selectedRows.length != 1){
+    if (selectedRows.length != 1) {
       message.error('请选择一个账户进行修改操作！');
       return false;
     }
-    this.setState({operateType:"edit"});
+    this.setState({ operateType: "edit" });
     this.showModal();
     var row = selectedRows[0];
-    var moment = Moment(row.registrationTime,'YYYY-MM-DD HH:mm:ss');
+    var moment = Moment(row.registrationTime, 'YYYY-MM-DD HH:mm:ss');
     row["registrationTime"] = moment;
     form.setFieldsValue(row);
     //下拉框的值单独回显，否则不能选中，会直接显示的option的key
-    var accountType = row['accountType']+'';
-    form.setFieldsValue({accountType:accountType });
-   
+    var accountType = row['accountType'] + '';
+    form.setFieldsValue({ accountType: accountType });
+
   }
   //删除选中项
-  deleteSelectRow = e =>{
-    const {selectedRows} = this.state;
-    const {dispatch} = this.props;
-    if(selectedRows.length < 1){
+  deleteSelectRow = e => {
+    const { selectedRows } = this.state;
+    if (selectedRows.length < 1) {
       message.error('请选择要删除的账户！');
       return false;
     }
-    dispatch({
-      type: 'account/deleteAccounts',
-      payload: selectedRows,
-      callback:() => {
-          const {addAccountResult} = this.props;
-          if(addAccountResult == "0"){
-            notification["error"]({
-              placement:"bottomRight",
-              message: '提示信息',
-              description: '操作失败!',
-            });
-          }else{
+    confirm({
+      title: '确定要删除所选项吗?',
+      content: '',
+      onOk: () => {
+        const { dispatch } = this.props;
+        dispatch({
+          type: 'account/deleteAccounts',
+          payload: selectedRows,
+          callback: () => {
+            const { addAccountResult } = this.props;
+            if (addAccountResult == "0") {
+              notification["error"]({
+                placement: "bottomRight",
+                message: '提示信息',
+                description: '操作失败!',
+              });
+            } else {
               notification["success"]({
-              placement:"bottomRight",
-              message: '提示信息',
-              description: '操作成功!',
+                placement: "bottomRight",
+                message: '提示信息',
+                description: '操作成功!',
+              });
+            }
+            //刷新表格
+            dispatch({
+              type: 'account/queryAccount',
+              payload: {
+                page: 1,
+                rows: 10,
+              },
             });
-          }
-          //刷新表格
-          dispatch({
-            type: 'account/queryAccount',
-            payload: {
-              page: 1,
-              rows: 10,
-            },
-          });
 
-      }
+          }
+        });
+      },
+      onCancel() { },
     });
+
   }
 
   //导出表格数据到excel文件
@@ -285,8 +294,8 @@ class Accountmanage extends PureComponent {
     let dateTime = Moment().format('YYYYMMDDHHmmss');
     axios({
       method: "get",
-     // url: "http://localhost:8080/exportAccount",
-     url:  "http://"+ location.host+"/exportAccount?accountName="+accountName+"&userName="+userName,
+      // url: "http://localhost:8080/exportAccount",
+      url: "http://" + location.host + "/exportAccount?accountName=" + accountName + "&userName=" + userName,
       headers: {
         // "MSP-AppKey": localStorage.getItem('appKey'),
         // "MSP-AuthKey": localStorage.getItem('auth-key'),
@@ -296,7 +305,7 @@ class Accountmanage extends PureComponent {
       const content = res.data
       console.log(res)
       const blob = new Blob([content])
-      const fileName = '账户信息表'+dateTime+'.xlsx'
+      const fileName = '账户信息表' + dateTime + '.xlsx'
       if ('download' in document.createElement('a')) { // 非IE下载
         const elink = document.createElement('a')
         elink.download = fileName
@@ -324,10 +333,10 @@ class Accountmanage extends PureComponent {
     form.resetFields();
   }
 
-  
+
   //新增&保存账户信息
   handleCreate = () => {
-   const {dispatch} = this.props;
+    const { dispatch } = this.props;
     const form = this.formRef.props.form;
     form.validateFields((err, values) => {
       if (err) {
@@ -337,42 +346,42 @@ class Accountmanage extends PureComponent {
       var registrationTime = values.registrationTime;
       registrationTime = registrationTime.format('YYYY-MM-DD HH:mm:ss');
       values["registrationTime"] = registrationTime;
-      const {operateType} = this.state;
+      const { operateType } = this.state;
       var url;
-      if(operateType ==  "add"){
+      if (operateType == "add") {
         var url = 'account/addAccount';
       }
-      if(operateType ==  "edit"){
+      if (operateType == "edit") {
         var url = 'account/modifyAccount';
       }
       dispatch({
         type: url,
         payload: values,
-        callback:() => {
-            const {addAccountResult} = this.props;
-            if(addAccountResult == "0"){
-              notification["error"]({
-                placement:"bottomRight",
-                message: '提示信息',
-                description: '操作失败!',
-              });
-            }else{
-                notification["success"]({
-                placement:"bottomRight",
-                message: '提示信息',
-                description: '操作成功!',
-              });
-            }
-            //刷新表格
-            dispatch({
-              type: 'account/queryAccount',
-              payload: {
-                page: 1,
-                rows: 10,
-              },
+        callback: () => {
+          const { addAccountResult } = this.props;
+          if (addAccountResult == "0") {
+            notification["error"]({
+              placement: "bottomRight",
+              message: '提示信息',
+              description: '操作失败!',
             });
-             //恢复被选中项
-             this.setState({selectedRows:[],selectedRowKeys:[]});
+          } else {
+            notification["success"]({
+              placement: "bottomRight",
+              message: '提示信息',
+              description: '操作成功!',
+            });
+          }
+          //刷新表格
+          dispatch({
+            type: 'account/queryAccount',
+            payload: {
+              page: 1,
+              rows: 10,
+            },
+          });
+          //恢复被选中项
+          this.setState({ selectedRows: [], selectedRowKeys: [] });
 
         }
       });
@@ -387,7 +396,7 @@ class Accountmanage extends PureComponent {
     this.formRef = formRef;
   }
 
- 
+
 
   rowClassName = (record, index) => {
     let className = 'light-row';
@@ -408,18 +417,18 @@ class Accountmanage extends PureComponent {
       dataIndex: 'accountType',
       render: (text, record, index) => {
         var accountType = text;
-        direction.map((d) =>{
-          if(text == d.id){
+        direction.map((d) => {
+          if (text == d.id) {
             accountType = d.text;
           }
-        } )
+        })
         return accountType;
       }
     },
     {
       title: '用户密码',
       dataIndex: 'passWord',
-      
+
     }
       ,
     {
@@ -451,11 +460,11 @@ class Accountmanage extends PureComponent {
       dataIndex: 'remarks',
     }
     ];
-    const { accountList, total, form,direction } = this.props;
-    const {operateType,selectedRowKeys} = this.state;
+    const { accountList, total, form, direction } = this.props;
+    const { operateType, selectedRowKeys } = this.state;
     return (
       <div>
-        <Form onSubmit={this.handleSearch} layout="inline" style={{marginBottom:"1%",marginLeft:"1%"}}>
+        <Form onSubmit={this.handleSearch} layout="inline" style={{ marginBottom: "1%", marginLeft: "1%" }}>
           <Row >
             <Col span={5}>
               <FormItem label="账户名称">
@@ -471,24 +480,25 @@ class Accountmanage extends PureComponent {
             </Col>
 
             <Col span={2}>
-                <div style={{marginLeft:"-50%"}}>
-                  <Button type="primary" icon="search" onClick={this.handleSearch}>搜索</Button>
-                </div>
+              <div style={{ marginLeft: "-50%" }}>
+                <Button type="primary" icon="search" onClick={this.handleSearch}>搜索</Button>
+              </div>
             </Col>
             <Col span={12}>
-                <div style={{float:"right",marginRight:0  }}>
-                  <Button type="primary" icon="plus" onClick={this.addAccount}>新增</Button>
-                  <Button type="primary" icon="edit" onClick={this.editSelectRow} style={{marginLeft:8}}>修改</Button>
-                  <Button type="primary" icon="delete" onClick={this.deleteSelectRow} style={{marginLeft:8}}>删除</Button>
-                  <Button type="primary" icon="printer" onClick={this.exportAccount} style={{marginLeft:8}}>导出</Button>
-                </div>
+              <div style={{ float: "right", marginRight: 0 }}>
+                <Button type="primary" icon="plus" onClick={this.addAccount}>新增</Button>
+                <Button type="primary" icon="edit" onClick={this.editSelectRow} style={{ marginLeft: 8 }}>修改</Button>
+                <Button type="primary" icon="delete" onClick={this.deleteSelectRow} style={{ marginLeft: 8 }}>删除</Button>
+                <Button type="primary" icon="printer" onClick={this.exportAccount} style={{ marginLeft: 8 }}>导出</Button>
+              </div>
             </Col>
           </Row>
         </Form>
-        <Table 
-          rowSelection={{onChange: (selectedRowKeys, selectedRows) => {this.setState({selectedRows:selectedRows,selectedRowKeys:selectedRowKeys}) ;},
-          selectedRowKeys:selectedRowKeys
-        }} 
+        <Table
+          rowSelection={{
+            onChange: (selectedRowKeys, selectedRows) => { this.setState({ selectedRows: selectedRows, selectedRowKeys: selectedRowKeys }); },
+            selectedRowKeys: selectedRowKeys
+          }}
           columns={columns} dataSource={accountList} rowKey="accountId" bordered
           pagination={{
             showSizeChanger: true, defaultCurrent: 1, total: total, defaultPageSize: 10, hideOnSinglePage: false,
@@ -501,9 +511,9 @@ class Accountmanage extends PureComponent {
           wrappedComponentRef={this.saveFormRef}
           visible={this.state.formvisible}
           onCancel={this.handleCancel}
-          onCreate={this.handleCreate} 
-          direction = {direction}
-          operateType = {operateType}
+          onCreate={this.handleCreate}
+          direction={direction}
+          operateType={operateType}
         />
       </div>
     );

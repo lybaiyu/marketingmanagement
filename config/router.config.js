@@ -47,6 +47,12 @@ export default [
           icon:'shopping-cart'
         },
         {
+          path: '/market/salesmanage',
+          name: 'salesmanage',
+          component: './Market/Salesmanage',
+          icon:'shop'
+        },
+        {
           path: '/market/inventorymanage',
           name: 'inventorymanage',
           component: './Market/Inventorymanage',

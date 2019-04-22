@@ -104,7 +104,6 @@ export async function queryGoods(params) {
     }
 
     //删除采购记录
-    
     export async function deletePurchase(params) {
       return request('/service/deletePurchase/',
       {
@@ -123,4 +122,34 @@ export async function queryGoods(params) {
       headers:{'Content-Type': 'application/json;charset=utf-8'}
       });
     }
+    //查询售出记录    
+    export async function querySales(params) {
+      return request('/service/querySales/',
+      {
+      method:"post",
+      body: JSON.stringify(params),
+      headers:{'Content-Type': 'application/json;charset=utf-8'}
+      });
+    }
+
+   //新增销售记录
+    export async function addSales(params) {
+      return request('/service/addSales/',
+      {
+      method:"post",
+      body: JSON.stringify(params),
+      headers:{'Content-Type': 'application/json;charset=utf-8'}
+      });
+    }
+    
+    //删除销售记录
+    export async function deleteSales(params) {
+      return request('/service/deleteSales/',
+      {
+      method:"post",
+      body: JSON.stringify(params),
+      headers:{'Content-Type': 'application/json;charset=utf-8'}
+      });
+    }
+
 

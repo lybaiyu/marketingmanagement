@@ -45,4 +45,5 @@ export default {
   'menu.market.suppliermanage': '供货商管理',
   'menu.market.purchasemanage': '采购记录管理',
   'menu.market.inventorymanage': '商品库存管理',
+  'menu.market.salesmanage': '销售记录管理',
 };

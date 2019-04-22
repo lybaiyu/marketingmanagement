@@ -13,6 +13,7 @@ import axios from 'axios'
 import $ from  'jquery'
 import jsonp from 'fetch-jsonp';
 import querystring from 'querystring';
+const confirm = Modal.confirm;
 
 message.config({
     top: 300,
@@ -31,7 +32,7 @@ function fetch(value) {
  var allGoods = [];
     $.ajax({
         type: "POST",
-        url: "http://localhost:8080/service/queryGoods",
+        url:  "http://" + location.host+"/service/queryGoods",
         contentType: "application/json",
         dataType: "JSON",
         async: false,
@@ -59,13 +60,12 @@ function fetch2(value) {
     var allquerySupplier = [];
        $.ajax({
            type: "POST",
-           url: "http://localhost:8080/service/querySupplier",
+           url: "http://" + location.host+"/service/querySupplier",
            contentType: "application/json",
            dataType: "JSON",
            async: false,
            data: JSON.stringify({ "name": value }),
            success: function (data) {
-               debugger;
                var list = data.rows;
                console.log("data2"+JSON.stringify(list));
                if (list.length > 0) {
@@ -99,7 +99,6 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
           handleSearch = (value) => {
           let list =  fetch(value);
           if(list.length > 0){
-            debugger;
             this.setState({ data:list }) ;
           }
          
@@ -111,7 +110,6 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
           handleSearch2 = (value) => {
             let list =  fetch2(value);
             if(list.length > 0){
-              debugger;
               this.setState({ data2:list }) ;
             }
            
@@ -150,7 +148,7 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                 >
                     <Form {...formItemLayout} style={{ marginLeft: "-20%" }}>
                         <Form.Item label="商品名称">
-                            {getFieldDecorator('goodsName', {
+                            {getFieldDecorator('goodsId', {
                                 rules: [{ required: true, message: '商品名称不能为空!' }],
                             })(
                                 <Select
@@ -363,35 +361,43 @@ class Purchasemanage extends PureComponent {
             message.error('采购记录只能逐条删除！');
             return false;
         }
-        dispatch({
-            type: 'market/deletePurchase',
-            payload: selectedRows,
-            callback: () => {
-                const { updatePurchaseResult } = this.props;
-                if (updatePurchaseResult == 0) {
-                    notification["error"]({
-                        placement: "bottomRight",
-                        message: '提示信息',
-                        description: '操作失败!',
-                    });
-                } else {
-                    notification["success"]({
-                        placement: "bottomRight",
-                        message: '提示信息',
-                        description: '操作成功!',
-                    });
-                }
-                //刷新表格
+        confirm({
+            title: '确定要删除所选项吗?',
+            content: '',
+            onOk: () => {
                 dispatch({
-                    type: 'market/queryPurchase',
-                    payload: {
-                        page: 1,
-                        rows: 10,
-                    },
+                    type: 'market/deletePurchase',
+                    payload: selectedRows,
+                    callback: () => {
+                        const { updatePurchaseResult } = this.props;
+                        if (updatePurchaseResult == 0) {
+                            notification["error"]({
+                                placement: "bottomRight",
+                                message: '提示信息',
+                                description: '操作失败!',
+                            });
+                        } else {
+                            notification["success"]({
+                                placement: "bottomRight",
+                                message: '提示信息',
+                                description: '操作成功!',
+                            });
+                        }
+                        //刷新表格
+                        dispatch({
+                            type: 'market/queryPurchase',
+                            payload: {
+                                page: 1,
+                                rows: 10,
+                            },
+                        });
+        
+                    }
                 });
-
-            }
-        });
+            },
+            onCancel() { },
+          });
+     
     }
 
 
@@ -610,7 +616,6 @@ class Purchasemanage extends PureComponent {
                 <Table
                      rowSelection={{
                         onChange: (selectedRowKeys, selectedRows) => {
-                            debugger;
                                    this.setState({selectedRows:selectedRows,selectedRowKeys:selectedRowKeys}) ;},
                       selectedRowKeys:selectedRowKeys
                     }} 

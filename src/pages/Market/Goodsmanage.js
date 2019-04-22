@@ -9,6 +9,7 @@ import Moment from 'moment';
 import router from 'umi/router';
 //import 'moment/locale/zh-cn';
 import axios from 'axios'
+const confirm = Modal.confirm;
 message.config({
   top: 300,
   duration: 2,
@@ -239,35 +240,45 @@ class Goodsmanage extends PureComponent {
       message.error('请选择要删除的账户！');
       return false;
     }
-    dispatch({
-      type: 'market/deleteGoods',
-      payload: selectedRows,
-      callback:() => {
-          const {addGoodsResult} = this.props;
-          if(addGoodsResult == 0){
-            notification["error"]({
-              placement:"bottomRight",
-              message: '提示信息',
-              description: '操作失败!',
-            });
-          }else{
-              notification["success"]({
-              placement:"bottomRight",
-              message: '提示信息',
-              description: '操作成功!',
-            });
+    confirm({
+      title: '确定要删除所选项吗?',
+      content: '',
+      onOk: () => {
+        dispatch({
+          type: 'market/deleteGoods',
+          payload: selectedRows,
+          callback:() => {
+              const {addGoodsResult} = this.props;
+              if(addGoodsResult == 0){
+                notification["error"]({
+                  placement:"bottomRight",
+                  message: '提示信息',
+                  description: '操作失败!',
+                });
+              }else{
+                  notification["success"]({
+                  placement:"bottomRight",
+                  message: '提示信息',
+                  description: '操作成功!',
+                });
+              }
+              //刷新表格
+              dispatch({
+                type: 'market/queryGoods',
+                payload: {
+                  page: 1,
+                  rows: 10,
+                },
+              });
+    
           }
-          //刷新表格
-          dispatch({
-            type: 'market/queryGoods',
-            payload: {
-              page: 1,
-              rows: 10,
-            },
-          });
-
-      }
+        });
+      },
+      onCancel() { },
     });
+   
+
+   
   }
   
   
