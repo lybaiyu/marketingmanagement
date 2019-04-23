@@ -116,16 +116,7 @@ export default class GlobalHeaderRight extends PureComponent {
             console.log('enter', value); // eslint-disable-line
           }}
         />
-        <Tooltip title={formatMessage({ id: 'component.globalHeader.help' })}>
-          <a
-            target="_blank"
-            href="https://pro.ant.design/docs/getting-started"
-            rel="noopener noreferrer"
-            className={styles.action}
-          >
-            <Icon type="question-circle-o" />
-          </a>
-        </Tooltip>
+       
         <NoticeIcon
           className={styles.action}
           count={currentUser.unreadCount}
@@ -185,7 +176,8 @@ export default class GlobalHeaderRight extends PureComponent {
             </span>
           </HeaderDropdown>
         ) : (
-          <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
+          // <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
+          " "
         )}
         <SelectLang className={styles.action} />
       </div>

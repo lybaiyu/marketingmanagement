@@ -187,7 +187,7 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                         </Form.Item>
                         <Form.Item label="供货商">
                             {getFieldDecorator('supplierName', {
-                                rules: [{}],
+                                rules: [{ required: true, message: '供货商不能为空!' }],
                             })(
                                    <Select
                                     showSearch

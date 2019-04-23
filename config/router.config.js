@@ -21,7 +21,7 @@ export default [
     // Routes: ['src/pages/Authorized'],
     routes: [
       // dashboard   原本为 redirect: '/dashboard/analysis'
-      { path: '/', redirect: '/utils/accountmanage' },
+      { path: '/', redirect: '/market/salesmanage' },
      //店铺管理菜单
      {
       path: '/market',

@@ -108,34 +108,36 @@ export default class NoticeIcon extends PureComponent {
     const { visible } = this.state;
     const noticeButtonClass = classNames(className, styles.noticeButton);
     const notificationBox = this.getNotificationBox();
-    const NoticeBellIcon = bell || <Icon type="bell" className={styles.icon} />;
-    const trigger = (
-      <span className={classNames(noticeButtonClass, { opened: visible })}>
-        <Badge count={count} style={{ boxShadow: 'none' }} className={styles.badge}>
-          {NoticeBellIcon}
-        </Badge>
-      </span>
-    );
-    if (!notificationBox) {
-      return trigger;
-    }
+    //const NoticeBellIcon = bell || <Icon type="bell" className={styles.icon} />;
+  //  const NoticeBellIcon = bell || "";
+    // const trigger = (
+    //   <span className={classNames(noticeButtonClass, { opened: visible })}>
+    //     <Badge count={count} style={{ boxShadow: 'none' }} className={styles.badge}>
+    //       {NoticeBellIcon}
+    //     </Badge>
+    //   </span>
+    // );
+    // if (!notificationBox) {
+    //   return trigger;
+    // }
     const popoverProps = {};
     if ('popupVisible' in this.props) {
       popoverProps.visible = popupVisible;
     }
     return (
-      <HeaderDropdown
-        placement="bottomRight"
-        overlay={notificationBox}
-        overlayClassName={styles.popover}
-        trigger={['click']}
-        visible={visible}
-        onVisibleChange={this.handleVisibleChange}
-        {...popoverProps}
-        ref={node => (this.popover = ReactDOM.findDOMNode(node))} // eslint-disable-line
-      >
-        {trigger}
-      </HeaderDropdown>
+      // <HeaderDropdown
+      //   placement="bottomRight"
+      //   overlay={notificationBox}
+      //   overlayClassName={styles.popover}
+      //   trigger={['click']}
+      //   visible={visible}
+      //   onVisibleChange={this.handleVisibleChange}
+      //   {...popoverProps}
+      //   ref={node => (this.popover = ReactDOM.findDOMNode(node))} // eslint-disable-line
+      // >
+      //   {trigger}
+      // </HeaderDropdown>
+      ""
     );
   }
 }
