@@ -140,9 +140,11 @@ class HeaderView extends Component {
             {...this.props}
           />
         )}
+        
       </Header>
     ) : null;
     return (
+      
       <Animate component="" transitionName="fade">
         {HeaderDom}
       </Animate>

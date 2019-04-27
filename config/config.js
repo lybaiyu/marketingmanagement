@@ -82,7 +82,7 @@ export default {
   },
   proxy: {
     '/service': {
-      target: 'http://localhost:8080/service',
+      target: 'http://localhost/service',
       changeOrigin: true,
       pathRewrite: { '^/service': '' },
     },

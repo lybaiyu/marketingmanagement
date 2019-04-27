@@ -4,7 +4,7 @@ import { fakeAccountLogin, getFakeCaptcha } from '@/services/api';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import { reloadAuthorized } from '@/utils/Authorized';
-
+import {  message } from 'antd';
 export default {
   namespace: 'login',
 
@@ -38,6 +38,8 @@ export default {
           }
         }
         yield put(routerRedux.replace(redirect || '/'));
+      }else{
+        message.warning("登录失败！请检查用户名和密码是否正确！")
       }
     },
 

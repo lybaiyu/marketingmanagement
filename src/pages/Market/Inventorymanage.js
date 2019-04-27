@@ -227,7 +227,6 @@ class Inventorymanage extends PureComponent {
                 <Table
                      rowSelection={{
                         onChange: (selectedRowKeys, selectedRows) => {
-                            debugger;
                                    this.setState({selectedRows:selectedRows,selectedRowKeys:selectedRowKeys}) ;},
                       selectedRowKeys:selectedRowKeys
                     }} 
