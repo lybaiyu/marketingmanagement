@@ -456,9 +456,9 @@ class Goodsmanage extends PureComponent {
           <Row >
             <Col span={5}>
               <FormItem label="商品名称">
-                {form.getFieldDecorator('name')(<Input placeholder="请输入账户名称" />)}
+                {form.getFieldDecorator('name')(<Input placeholder="请输入商品名称" />)}
               </FormItem>
-            </Col>
+            </Col> 
             <Col span={5}>
               <FormItem label="商品型号">
                 {form.getFieldDecorator('model')(
