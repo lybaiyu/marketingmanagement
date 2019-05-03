@@ -584,13 +584,13 @@ class Purchasemanage extends PureComponent {
                                 )}
                             </FormItem>
                         </Col>
-                        <Col span={4} style={{ marginTop: "-2px" }}>
+                        <Col span={5} style={{ marginTop: "-2px" }}>
                             <FormItem label="供货商名称">
                                 {form.getFieldDecorator('supplierName')(<Input placeholder="请输入供货商名称" />)}
                             </FormItem>
                         </Col>
 
-                        <Col span={4}>
+                        <Col span={5}>
                             <FormItem label="采购日期">
                                 {form.getFieldDecorator('purchaseDate')(
                                     <DatePicker  placeholder="请选择采购日期" />
@@ -603,7 +603,7 @@ class Purchasemanage extends PureComponent {
                             </div>
                         </Col>
 
-                        <Col span={10}>
+                        <Col span={8}>
                             <div style={{ float: "right", marginRight: 0 }}>
                                 <Button type="primary" icon="plus" onClick={this.addAccount}>新增</Button>
                                 {/* <Button type="primary" icon="edit" onClick={this.editSelectRow} style={{ marginLeft: 8 }}>修改</Button> */}
