@@ -38,9 +38,9 @@ export default class GlobalHeader extends PureComponent {
      // data: JSON.stringify({ "version": 'v1',"cityid":'101180909' }),
       success: function (data) {
         var weatherStr ="今日天气&nbsp;&nbsp;&nbsp;"+ data.city +":&nbsp;";
-        weatherStr += data.data[0].wea+"&nbsp;&nbsp;&nbsp;最高温度：";
-        weatherStr += data.data[0].tem1+"&nbsp;&nbsp;&nbsp;最低温度：";
-        weatherStr += data.data[0].tem2+"&nbsp;&nbsp;&nbsp;空气质量：";
+        weatherStr += data.data[0].wea+"&nbsp;&nbsp;&nbsp;温度：";
+        weatherStr += data.data[0].tem2+"/";
+        weatherStr += data.data[0].tem1+"&nbsp;&nbsp;&nbsp;空气质量：";
         weatherStr += data.data[0].air_level+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;明日天气：";
         weatherStr += data.data[1].wea+"&nbsp";
         $("#weather").html(weatherStr);
@@ -92,7 +92,10 @@ export default class GlobalHeader extends PureComponent {
           <Icon type={collapsed ? 'menu-unfold' : 'menu-fold'} />
         </span >
         &nbsp; <span id="date"style={{fontWeight:"bold"}}> {date}</span>
-        <span id="weather" style={{marginLeft:"45%",color:"blue",fontWeight:"bold"}}>今日天气： </span>
+        <div style={{float:"right"}}>
+        <span id="weather" style={{color:"blue",fontWeight:"bold"}}>今日天气： </span>
+        </div>
+        
         <RightContent {...this.props} />
       </div>
     );
